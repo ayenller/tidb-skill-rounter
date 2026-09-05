@@ -110,6 +110,35 @@ fi
 rm -rf "${root}/.tidb-aio/sessions/${sid}" "${root}/.tidb-aio/sessions/${forked}"
 
 echo
+echo "M4: retriever seam"
+node scripts/retrieve.mjs --goal 'TiKV panic' --retriever bm25 --top 2 \
+    | check "explicit --retriever bm25 works" 'retriever bm25'
+if out="$(node scripts/retrieve.mjs --goal 'x' --retriever nope 2>&1)"; then
+    bad "unknown retriever was accepted"
+elif grep -qF "unknown retriever 'nope'" <<<"${out}" && grep -qF 'Available: bm25' <<<"${out}"; then
+    pass "unknown retriever fails with the available list"
+else
+    bad "unknown retriever failed with an unhelpful message"
+fi
+
+echo
+echo "M4: lexicon audit"
+node scripts/lexicon-audit.mjs --from eval --no-signal \
+    | check "audit reports lexicon coverage" 'terms,'
+node scripts/lexicon-audit.mjs --from eval --no-signal \
+    | check "audit separates lexicon gaps from subject gaps" 'subject` gap'
+
+echo
+echo "M4: runtime adapters"
+node scripts/export-adapters.mjs >/dev/null
+for f in adapters/opencode/command/tidb.md adapters/codex/prompts/tidb.md adapters/install.sh; do
+    if [[ -f "${f}" ]]; then pass "generated ${f}"; else bad "missing ${f}"; fi
+done
+grep -q 'TIDB_AIO_ROOT' adapters/opencode/command/tidb-catalog.md \
+    && pass "adapters rewrite the plugin-root variable" \
+    || bad "adapters still reference CLAUDE_PLUGIN_ROOT"
+
+echo
 echo "M2: routing eval"
 if node scripts/run-eval.mjs >/dev/null 2>&1; then
     pass "routing eval clears every threshold"

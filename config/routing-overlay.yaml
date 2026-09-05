@@ -82,7 +82,10 @@ skills:
     effect: write-prod
   platform/o11y-metrics-api:
     intent: [query]
-    subject: [metrics, prometheus, promql, timeseries, k8s-node]
+    # The skill's own text says only metrics/prometheus/promql, but what people
+    # ask for is "TiKV CPU" or "TiDB QPS". Naming the components it actually
+    # serves is what `subject` is for - found by scripts/lexicon-audit.mjs.
+    subject: [metrics, prometheus, promql, timeseries, k8s-node, tikv, tidb, pd, cpu, memory, qps, node]
     requires: [platform/o11y-auth]
     requires_when:
       starter: [platform/tidbcloud-serverless-pool-routing]

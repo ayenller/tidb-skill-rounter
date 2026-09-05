@@ -75,7 +75,10 @@ prerequisites (auto-inserted, in order):
 | `config/routing-overlay.yaml` | the **only** hand-maintained file: scope, effect, prerequisites, families |
 | `config/lexicon.yaml` | Chinese goal → English skill vocabulary, so coarse retrieval survives Chinese input |
 | `scripts/build-catalog.mjs` | scanner + validator; fails loudly on orphaned overlay ids |
-| `scripts/retrieve.mjs` | deterministic coarse filter (stage 1 of 2) |
+| `scripts/retrieve.mjs` | the retrieval seam: arg parsing, dispatch, rendering |
+| `scripts/retrievers/*.mjs` | the actual stage-1 scoring; swap by one config line ([contract](scripts/retrievers/CONTRACT.md)) |
+| `scripts/lexicon-audit.mjs` | which Chinese wording still reaches the retriever as noise |
+| `scripts/export-adapters.mjs` | regenerates the same commands for OpenCode and Codex |
 | `scripts/verify-plan.mjs` | deterministic plan checker — the model proposes, this decides |
 | `scripts/trajectory.mjs` | append-only session log; `resume`, `fork`, `replay`, `gaps` are reconstructed from it |
 | `scripts/run-eval.mjs` | routing eval over `eval/routing-cases.yaml` |
@@ -170,9 +173,42 @@ correctness. Short Chinese goals route correctly on one concept of overlap or
 none at all, so signal is asserted only on the negative cases and must never
 gate execution by itself.
 
+## Portability
+
+Only the command layer is Claude-specific, and it is generated:
+
+```bash
+make adapters      # regenerate adapters/opencode/ and adapters/codex/
+bash adapters/install.sh
+```
+
+The catalog, overlay, lexicon, retriever, verifier, trajectory, eval and the
+router skill itself are shared verbatim across all three runtimes. If porting
+ever needs more than `scripts/export-adapters.mjs`, that claim was false.
+
+## Maintaining the Chinese lexicon
+
+```bash
+make lexicon
+```
+
+Ranks unmapped Chinese phrases by *harm* — how often they appear in goals that
+actually retrieved weakly — rather than by frequency, so grammatical filler
+sinks and real gaps float. It sorts findings into three kinds and only one of
+them is a lexicon edit:
+
+1. a Chinese word for something a skill's text already says in English → lexicon gap;
+2. a word for something a skill **does** but its text never says → a `subject`
+   gap in the overlay. This is the common one: "TiKV CPU 指标" scored weak
+   against `o11y-metrics-api` because its text says *metrics/prometheus/promql*
+   and never names a component. Adding the components it serves took that case
+   from weak to strong with zero regressions across 43 eval cases;
+3. a phrase no skill covers → leave it. Scoring zero is the router correctly
+   reporting it does not know.
+
 ## Status
 
-M0-M3 complete; `make smoke` runs 27 checks and includes the eval.
+M0-M4 complete; `make smoke` runs 35 checks and includes the eval.
 
 Implemented: catalog build and validation, overlay, bilingual coarse retrieval,
 concept-level signal, family collapse, prerequisite closure, plan verification,
@@ -182,7 +218,12 @@ resume / fork / replay / gaps, the `tidb-planner` subagent, four modes
 routing eval, and a daily CI job that rebuilds the catalog against upstream HEAD
 and opens a drift PR.
 
-Next: vector retrieval to replace BM25 — the standing answer to short Chinese
-goals that route correctly with no keyword evidence — and OpenCode/Codex command
-adapters. Both swap one component without touching the other six. See
-DESIGN.md §10.
+Also implemented: the retriever seam (proved behaviour-preserving — extracting
+BM25 into `scripts/retrievers/bm25.mjs` changed no ranking in any of the 43
+cases), the lexicon audit, and the OpenCode/Codex adapters.
+
+Not done: a semantic retriever. It is the only real answer to a goal like
+"把备份恢复到新集群", which routes correctly today on the intent prior with **no**
+keyword evidence at all. The seam is ready for it — one file implementing
+[the contract](scripts/retrievers/CONTRACT.md) plus one config line — but it
+needs an embeddings endpoint, which this plugin does not currently depend on.

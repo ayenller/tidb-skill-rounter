@@ -1,4 +1,4 @@
-.PHONY: sync catalog digest verify sessions replay gaps eval smoke clean
+.PHONY: sync catalog digest verify sessions replay gaps eval lexicon adapters smoke clean
 
 sync:      ## clone/update the nutshell-skills checkout
 	@bash scripts/sync-source.sh
@@ -21,8 +21,14 @@ replay:    ## readable trace of a session: make replay S=s_2026...
 gaps:      ## goals no skill covered, across all sessions
 	@node scripts/trajectory.mjs gaps
 
-eval:      ## routing eval: top1 / top3 recall / prerequisites / wrong product line
+eval:      ## routing eval: top1 / top3 recall / prerequisites / wrong product line / signal
 	@node scripts/run-eval.mjs
+
+lexicon:   ## which Chinese wording still reaches the retriever as noise
+	@node scripts/lexicon-audit.mjs
+
+adapters:  ## regenerate the OpenCode and Codex command files
+	@node scripts/export-adapters.mjs
 
 smoke:     ## acceptance: catalog + routing + plan verification + trajectory + eval
 	@bash scripts/smoke.sh

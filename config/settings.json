@@ -10,5 +10,7 @@
   "defaults": {
     "mode": "guided",
     "readOnly": true
-  }
+  },
+  "$comment2": "retriever: which scripts/retrievers/<id>.mjs to use for stage-1 retrieval. See scripts/retrievers/CONTRACT.md.",
+  "retriever": "bm25"
 }

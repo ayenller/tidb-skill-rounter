@@ -343,6 +343,8 @@ TiDB-All-in-One/
 
 四个指标：**Top-1 命中率**、**Top-3 召回**、**前置补全率**、**误入无关产品线率**。
 
+> M4 补充：`lexicon-audit.mjs` 跑完 43 例语料后给出一个反直觉但重要的结论——剩下的弱信号**不是词表缺口，是 overlay 的 `subject` 缺口**。`o11y-metrics-api` 的原文只说 metrics/prometheus/promql，从不提组件名，而运维问的是"TiKV CPU 指标"。把它实际服务的组件补进 `subject` 后，该例从 weak 变 strong，43 例零回归。词表能治的是"同一件事的中英说法"，治不了"skill 自己没说过这个词"。
+>
 > M2 实测与两处修正——eval 一上来就 18/35，暴露了两个系统性缺陷，都不是个别 case 的问题：
 > 1. **家族入口永远压过叶子**。原设计"同家族只推入口"让 top1 恒为 handbook，5 个 case 全挂。改为**叶子在前、入口紧随其后**：运维报的是具体症状（"日志里有 SIGSEGV"），每次都先绕一趟 handbook 是白花一跳；入口仍在第二位兜底。
 > 2. **intent 权重太弱**（原 ×1.25）。"暂停 changefeed" 和 "CDC 把 TiKV 打 panic" 词汇高度重叠却要去不同 skill，而 diagnosis 类 handbook 又多又关键词密集，会淹没所有 operate/manage 查询。改为**匹配 ×1.6、不匹配 ×0.65**。
@@ -359,7 +361,8 @@ TiDB-All-in-One/
 | **M1** ✅ 已完成 | `tidb-planner` 精排子 agent + `verify-plan.mjs` + 前置依赖闭包 + 安全闸门 + `trajectory.mjs`（写入 / `resume` / `fork`）+ `/tidb-resume` | `make smoke` 20 项全绿：六种计划失败模式全部拦下、两个正确计划放行、trajectory 写入→resume→fork 往返一致 |
 | **M2** ✅ 已完成 | `eval/routing-cases.yaml`(35 例) + `run-eval.mjs` + `replay` + `gaps`（改为 trajectory 事件，不再单独落 `gaps.jsonl`）+ `/tidb-plan`、`/tidb-which` 两个模式 + `catalog-drift.yml` 每日 CI | 实测 Top-1 100%、Top-3 召回 100%、前置补全 100%、误入产品线 0%、兜底率 5.7%；阈值已收紧到 0.85/0.95/1.0/0.05 防回归 |
 | **M3** ✅ 已完成 | 步骤级 `effect` 收窄（`effect_min` 白名单 + 强制 justification）+ 概念级 `signal` 判定 + `sharpen` 槽位提示 + 负例/近邻例扩到 43 例 | `make smoke` 27 项全绿；eval 43/43，五项指标（含"知道自己不知道"）全部达标 |
-| **M4**（未做） | 向量检索替换 BM25；OpenCode/Codex 适配器（catalog 与 overlay 完全复用，只换 command 层） | 换检索器不动其余 6 个部件；中文短句零关键词证据的问题只能靠它解决 |
+| **M4** ✅ 部分完成 | 检索器接缝（`scripts/retrievers/` + `CONTRACT.md` + 配置切换）、`lexicon-audit.mjs`（按"实际造成弱信号"排序而非词频）、OpenCode/Codex 适配器生成 | 抽取 BM25 到独立模块后 43 例排序**零变化**，接缝可换性得证；`make smoke` 35 项全绿 |
+| **M5**（未做） | 语义/向量检索 | 需要 embeddings 端点，本插件目前不依赖网络。接缝已就绪：新增一个实现 CONTRACT 的文件 + 一行配置。这是"把备份恢复到新集群"这类零关键词证据查询的唯一真解 |
 
 **CI**：一个 workflow 定时拉 `nutshell-skills` HEAD，重建 catalog，diff 非空则开 PR，并对 overlay 里已失效的 skill id 报错——这是防止"配置层"腐烂的唯一手段。
 

@@ -1,6 +1,6 @@
 # nutshell-skills capability digest
 
-Generated 2026-09-05T08:00:53.189Z from tidbcloud/nutshell-skills@dddd54f.
+Generated 2026-09-05T09:06:59.830Z from tidbcloud/nutshell-skills@dddd54f.
 Do not edit; run `make catalog`. Load a full SKILL.md only when the plan selects it.
 
 ## daily_work

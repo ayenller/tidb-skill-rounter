@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-09-05T08:00:53.189Z",
+  "generated_at": "2026-09-05T09:06:59.830Z",
   "source": {
     "repo": "tidbcloud/nutshell-skills",
     "commit": "dddd54f",
@@ -1776,7 +1776,14 @@
         "prometheus",
         "promql",
         "timeseries",
-        "k8s-node"
+        "k8s-node",
+        "tikv",
+        "tidb",
+        "pd",
+        "cpu",
+        "memory",
+        "qps",
+        "node"
       ],
       "requires": [
         "platform/o11y-auth"
