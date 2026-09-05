@@ -191,6 +191,21 @@ function build() {
     skills,
   };
 
+  // The CI drift job diffs catalog/, so a rebuild that changed nothing must
+  // produce a byte-identical file. Carry the previous timestamp forward when
+  // the content is unchanged, otherwise every build is a spurious diff.
+  let unchanged = false;
+  if (fs.existsSync(CATALOG_PATH)) {
+    try {
+      const previous = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8'));
+      const strip = (c) => JSON.stringify({ ...c, generated_at: null });
+      if (strip(previous) === strip(catalog)) {
+        catalog.generated_at = previous.generated_at;
+        unchanged = true;
+      }
+    } catch { /* unreadable previous catalog: just overwrite it */ }
+  }
+
   fs.mkdirSync(path.dirname(CATALOG_PATH), { recursive: true });
   fs.writeFileSync(CATALOG_PATH, JSON.stringify(catalog, null, 2) + '\n');
   fs.writeFileSync(DIGEST_PATH, renderDigest(catalog));
@@ -200,7 +215,7 @@ function build() {
   console.log(`skills     ${skills.length} across ${Object.keys(byCategory).length} categories`);
   console.log(`overlay    ${seenOverlay.size}/${skills.length} covered`);
   console.log(`context    digest ${catalog.stats.digest_tokens_total} tok  |  all SKILL.md ${catalog.stats.full_tokens_total} tok  |  with bundles ${catalog.stats.bundle_tokens_total} tok`);
-  console.log(`wrote      ${rel(CATALOG_PATH)}, ${rel(DIGEST_PATH)}`);
+  console.log(`wrote      ${rel(CATALOG_PATH)}, ${rel(DIGEST_PATH)}${unchanged ? '  (unchanged since last build)' : '  (CONTENT CHANGED)'}`);
   if (warnings.length) {
     console.log(`\n${warnings.length} warning(s):`);
     for (const w of warnings) console.log(`  - ${w}`);
