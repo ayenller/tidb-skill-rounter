@@ -1,0 +1,10 @@
+plan_id: p_fixture_narrowed_unjustified
+goal: "read a ticket"
+product_line: dedicated
+constraints: { read_only: true }
+steps:
+  - id: s1
+    skill: platform/jira-api
+    effect: read-only
+    why: "read it"
+    needs: []

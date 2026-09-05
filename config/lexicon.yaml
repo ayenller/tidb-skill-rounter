@@ -1,0 +1,101 @@
+# Bilingual retrieval lexicon.
+#
+# Upstream SKILL.md text is English; operators state goals in Chinese. The
+# coarse filter is keyword-based, so without this map a Chinese goal scores
+# zero against every skill and recall collapses to the safety fallback.
+# The model does the fine ranking and is bilingual - this file only has to be
+# good enough to keep the right candidate inside the Top-12.
+#
+# Format: <term>: <space-separated English tokens injected into the query>
+
+version: 1
+
+terms:
+  # symptoms
+  慢: slow latency performance
+  变慢: slow latency performance degradation
+  延迟: latency p99 duration
+  卡: stuck slow hang
+  卡住: stuck pending hang
+  抖动: jitter spike latency
+  毛刺: spike jitter latency
+  超时: timeout latency
+  瓶颈: bottleneck saturation
+  决策树: decision-tree fast-tune
+  报错: error failure
+  崩溃: panic crash restart
+  重启: restart panic crash
+  内存: memory oom heap
+  爆内存: oom memory
+  磁盘: disk io iops storage
+  热点: hotspot hot region
+  锁: lock contention pessimistic transaction
+  死锁: deadlock lock contention
+  慢查询: slow-query sql statement
+  慢日志: slowlog slow-query
+  堆积: backlog lag pending
+  积压: backlog lag pending
+  同步延迟: replication lag changefeed cdc
+  掉线: offline down store
+  不可用: unavailable outage down
+  暂停: pause suspend
+  恢复任务: resume
+  恢复到: restore backup
+  # objects
+  集群: cluster
+  节点: node store instance
+  实例: instance node
+  租户: tenant org
+  组织: org tenant
+  资源组: resource-group ru quota
+  副本: replica region peer
+  分区: region partition split
+  索引: index sql
+  表: table schema sql
+  备份: backup
+  恢复: restore
+  数据恢复: recovery restore
+  故障恢复: recovery unsafe-recovery
+  监控: metrics monitoring prometheus grafana
+  指标: metrics prometheus promql
+  日志: logs loki log
+  告警: alert alerting alertstore
+  工单: jira ticket issue support
+  值班: oncall schedule rotation
+  变更: release change deployment
+  发布: release deployment
+  上线: release deployment
+  扩容: scale-out scale scaling
+  缩容: scale-in scale scaling
+  部署: deploy deployment tiup
+  巡检: inspection daily-inspection health report
+  体检: inspection health report
+  报告: report
+  复盘: rca root-cause postmortem
+  增长: growth trend
+  趋势: trend growth
+  统计: count statistics analytics
+  累计: cumulative total count
+  新增: new daily count
+  导出: export pipeline
+  管道: pipeline export integration
+  成本: cost finops inventory
+  费用: cost finops billing
+  权限: auth permission credential
+  认证: auth token credential
+  登录: auth login credential
+  # components
+  主从: replication cdc changefeed
+  同步任务: changefeed cdc replication
+  数据同步: changefeed cdc replication
+  列存: tiflash mpp
+  调度: scheduling scheduler balance pd
+  弹性: autoscaling hpa scaling
+  自动扩缩容: autoscaling hpa scaling
+  # product lines
+  免费版: starter serverless
+  共享池: shared-pool starter essential serverless
+  专属: dedicated
+  独享: dedicated
+  自建: self-hosted on-premises
+  本地: self-hosted on-premises

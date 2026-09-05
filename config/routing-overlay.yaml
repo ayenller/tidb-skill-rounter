@@ -1,0 +1,299 @@
+# Routing overlay for tidbcloud/nutshell-skills.
+#
+# This is the ONLY file in this plugin that is maintained by hand. Everything
+# else about the catalog is derived from upstream SKILL.md files.
+#
+# Rules:
+#   - A skill missing from this file still gets catalogued and retrieved; it
+#     just falls back to `defaults` below and to keyword inference. Never block
+#     on overlay coverage.
+#   - Upstream is never modified. If upstream later adds an `x-routing:` block
+#     to its own frontmatter, build-catalog.mjs prefers upstream over this file.
+#
+# Fields:
+#   intent        diagnose | inspect | operate | deploy | query | report | manage | author
+#   scope         product lines: dedicated starter essential premium byoc self-hosted, or "*"
+#   subject       nouns this skill acts on (retrieval signal)
+#   requires      hard prerequisites, as catalog ids
+#   requires_when prerequisites that only apply for a given product line
+#   inputs        slots the skill needs; drives what Intake must ask for
+#   effect        read-only | write-nonprod | write-prod | destructive
+#                 The skill's capability envelope - what it *can* do.
+#   effect_min    the lowest effect a single plan step may claim for it, when
+#                 that step only uses the skill's read-only surface (searching a
+#                 ticket, listing changefeeds). Omit to forbid narrowing. Every
+#                 narrowing still needs a written justification and shows up in
+#                 the verifier output.
+#   entry         true if this is a family entry point that routes onward
+#   family        family key; retrieval keeps the entry and demotes siblings
+#   explicit_only true if upstream says "invoke only when explicitly requested"
+#   role          gate | none  (gate skills are loaded before non-read-only plans)
+
+version: 1
+
+defaults:
+  intent: [query]
+  scope: ["*"]
+  effect: write-prod
+
+skills:
+  # ---------------------------------------------------------------- platform
+  platform/alertstore-api:
+    intent: [query, manage]
+    subject: [alert, alerting, incident, ack, resolve, silence]
+    effect: write-nonprod
+    effect_min: read-only          # querying alerts writes nothing
+  platform/clinic-api:
+    intent: [query]
+    scope: [dedicated, byoc, starter, essential, premium]
+    subject: [metadata, metrics, logs, slow-query, top-sql, topology, component, profiling]
+    inputs: [org_id, cluster_id]
+    effect: read-only
+    entry: true
+    family: clinic
+  platform/devops-api:
+    intent: [operate, query, manage]
+    subject: [release, deployment, tenant, cluster, ticdc, bastion, incident, ops-portal]
+    effect: write-prod
+    effect_min: read-only          # tenant/cluster/changefeed metadata lookups are reads
+    entry: true
+    family: devops
+  platform/jira-api:
+    intent: [query, manage]
+    subject: [jira, ticket, issue, escalation, gtoc, tcoc, support]
+    effect: write-nonprod
+    effect_min: read-only          # searching and reading tickets writes nothing
+  platform/o11y-auth:
+    intent: [query]
+    subject: [auth, token, credential, github-pat, sts]
+    inputs: [github_pat]
+    effect: read-only
+  platform/o11y-data:
+    intent: [query]
+    scope: [dedicated, starter, essential, premium, byoc]
+    subject: [metrics, logs, slowlog, statements, s3, gcs, loki]
+    requires: [platform/o11y-auth]
+    inputs: [cluster_id, time_window]
+    effect: read-only
+  platform/o11y-data-export:
+    intent: [manage]
+    subject: [pipeline, export, integration, slow-query, raw-log]
+    requires: [platform/o11y-auth]
+    effect: write-prod
+  platform/o11y-metrics-api:
+    intent: [query]
+    subject: [metrics, prometheus, promql, timeseries, k8s-node]
+    requires: [platform/o11y-auth]
+    requires_when:
+      starter: [platform/tidbcloud-serverless-pool-routing]
+      essential: [platform/tidbcloud-serverless-pool-routing]
+    inputs: [cluster_id, time_window]
+    effect: read-only
+  platform/op-clinic-grafana-access:
+    intent: [query]
+    scope: [self-hosted]
+    subject: [grafana, dashboard, on-premises, panel, promql]
+    inputs: [chrome_session]
+    effect: read-only
+  platform/tidbcloud-api:
+    intent: [manage, query]
+    scope: [starter, essential, premium]
+    subject: [cluster, branch, sql, api-key, backup]
+    effect: write-prod
+  platform/tidbcloud-cli:
+    intent: [manage]
+    scope: [starter, essential, premium, dedicated]
+    subject: [cluster, cli, ticloud, backup, import, export]
+    effect: write-prod
+    effect_min: read-only          # `ticloud ... list/describe` are reads
+  platform/tidbcloud-http:
+    intent: [query]
+    scope: [starter, essential]
+    subject: [sql, http, serverless-driver, transaction]
+    effect: write-prod
+  platform/tidbcloud-serverless-pool-routing:
+    intent: [query]
+    scope: [starter, essential]
+    subject: [pool, routing, vendor-region, control-plane-info, shared-pool]
+    inputs: [pool_or_cluster_id]
+    effect: read-only
+
+  # --------------------------------------------------------------- diagnosis
+  diagnosis/tidb-perf-diagnosis:
+    intent: [diagnose]
+    scope: [dedicated, starter, essential, premium, byoc]
+    subject: [latency, p99, slow, oom, hotspot, slow-query, lock, contention, qps, performance]
+    # Diagnosis skills do not fetch data themselves; the data source depends on
+    # the product line. Modelling it here is what auto-inserts o11y-auth and
+    # serverless pool routing into the plan without the user ever asking.
+    requires_when:
+      starter: [platform/o11y-metrics-api]
+      essential: [platform/o11y-metrics-api]
+      premium: [platform/clinic-api]
+      dedicated: [platform/clinic-api]
+      byoc: [platform/clinic-api]
+    inputs: [cluster_id, time_window]
+    effect: read-only
+    entry: true
+    family: perf
+  diagnosis/tikv-fast-tune:
+    intent: [diagnose]
+    subject: [tikv, performance, bottleneck, latency, decision-tree, fast-tune]
+    requires_when:
+      starter: [platform/o11y-metrics-api]
+      essential: [platform/o11y-metrics-api]
+      premium: [platform/clinic-api]
+      dedicated: [platform/clinic-api]
+      byoc: [platform/clinic-api]
+    inputs: [cluster_id, time_window]
+    effect: read-only
+  diagnosis/tikv-oncall-handbook:
+    intent: [diagnose]
+    subject: [tikv, oncall, triage, incident]
+    effect: read-only
+    entry: true
+    family: tikv-oncall
+  diagnosis/tikv-panic:      { family: tikv-oncall, intent: [diagnose], subject: [tikv, panic, crash, sigsegv, restart-loop], effect: read-only }
+  diagnosis/tikv-raftstore:  { family: tikv-oncall, intent: [diagnose], subject: [tikv, raftstore, region, split, snapshot, learner], effect: read-only }
+  diagnosis/tikv-recovery:   { family: tikv-oncall, intent: [diagnose], subject: [tikv, recovery, data-loss, unsafe-recovery, tombstone], effect: read-only }
+  diagnosis/tikv-performance: { family: tikv-oncall, intent: [diagnose], subject: [tikv, grpc, disk, iops, flow-control, latency], effect: read-only }
+  diagnosis/tikv-storage:    { family: tikv-oncall, intent: [diagnose], subject: [tikv, rocksdb, titan, compaction, sst, disk], effect: read-only }
+  diagnosis/tikv-status-server: { family: tikv-oncall, intent: [diagnose], subject: [tikv, pprof, profiling, status-port, fd-leak], effect: read-only }
+  diagnosis/tikv-cdc:        { family: tikv-oncall, intent: [diagnose], subject: [tikv, cdc, changefeed, panic], effect: read-only }
+  diagnosis/transaction-oncall-handbook: { family: tikv-oncall, intent: [diagnose], subject: [transaction, pessimistic-lock, async-commit, stale-read, gc], effect: read-only }
+  diagnosis/tikv-memory:     { intent: [diagnose], subject: [tikv, memory, oom, heap, profile], effect: read-only }
+  diagnosis/tikv-scale:      { intent: [diagnose], subject: [tikv, scale-out, scale-in, store, migration, operator], effect: read-only }
+  diagnosis/tikv-slow-diagnosis:
+    intent: [diagnose]
+    # Not self-hosted: keyword inference latched onto "direct cluster
+    # investigations". It works against TiDB Cloud clusters of any line.
+    scope: ["*"]
+    subject: [tikv, slow, latency, regression, jira]
+    requires: [platform/jira-api]
+    effect: read-only
+  diagnosis/pd-oncall-handbook:
+    intent: [diagnose]
+    subject: [pd, oncall, triage, placement, scheduler, tso, etcd]
+    effect: read-only
+    entry: true
+    family: pd-oncall
+  diagnosis/pd-operations:      { family: pd-oncall, intent: [diagnose], subject: [pd, etcd, tls, dashboard, tso, prometheus], effect: read-only }
+  diagnosis/pd-placement-rules: { family: pd-oncall, intent: [diagnose], subject: [pd, placement-rule, isolation-label, location-label], effect: read-only }
+  diagnosis/pd-resource-control: { family: pd-oncall, intent: [diagnose], subject: [pd, ru, resource-control, token-bucket, throttling, runaway], effect: read-only }
+  diagnosis/pd-scheduling:      { family: pd-oncall, intent: [diagnose], subject: [pd, scheduler, region-health, balance, patrol, hot-region], effect: read-only }
+  diagnosis/ticdc-health-inspection:
+    intent: [inspect, diagnose]
+    subject: [ticdc, changefeed, lag, replication, health]
+    requires: [platform/clinic-api]
+    inputs: [cluster_id, time_window]
+    effect: read-only
+    entry: true
+    family: ticdc
+  diagnosis/dedicated-cloud-diag:
+    intent: [diagnose]
+    scope: [dedicated]
+    subject: [cr, lifecycle, vpc, peering, privatelink, appbox, stuck-creating]
+    effect: read-only
+    entry: true
+    family: dedicated-diag
+  diagnosis/ru-limit-inspection:
+    intent: [inspect]
+    scope: [dedicated]
+    subject: [ru, resource-group, quota, throttling]
+    effect: read-only
+  diagnosis/tidbcloud-dedicated-daily-inspection:
+    intent: [inspect, report]
+    scope: [dedicated]
+    subject: [daily-inspection, report, health]
+    effect: read-only
+  diagnosis/tidbcloud-serverless-daily-inspection:
+    intent: [inspect, report]
+    scope: [starter, essential]
+    subject: [daily-inspection, report, tikv, shared-pool]
+    requires: [platform/tidbcloud-serverless-pool-routing]
+    effect: read-only
+  diagnosis/autoscaler-dashboard:
+    intent: [inspect, report]
+    subject: [hpa, autoscaling, scaling, dashboard, scoring]
+    effect: read-only
+
+  # ------------------------------------------------------------ health_check
+  health_check/tiflash-health-inspection:
+    intent: [inspect, diagnose]
+    subject: [tiflash, mpp, query, health, report]
+    requires: [platform/clinic-api]
+    effect: read-only
+
+  # --------------------------------------------------------------------- ops
+  ops/manage-ticdc-changefeeds:
+    intent: [operate, manage, query]   # upstream: "create, list, query, pause, resume, remove, or update"
+    subject: [ticdc, changefeed, sink-uri, pause, resume, create]
+    requires: [platform/devops-api]
+    effect: write-prod
+    effect_min: read-only          # list/query changefeeds before touching one
+  ops/dedicated-cloud-ops:
+    intent: [operate]
+    scope: [dedicated]
+    subject: [dedicated, ops, procedure]
+    effect: write-prod
+    entry: true
+    explicit_only: true
+  ops/deploy-tidbx:            { intent: [deploy], scope: [self-hosted], subject: [tidbx, deploy, ssh, minio, single-machine], effect: write-nonprod }
+  ops/deploy-tidbx-aws-multinode: { intent: [deploy], scope: [self-hosted], subject: [tidbx, aws, ec2, multinode, s3, tiup], effect: write-nonprod }
+  ops/ticdc-next-gen-deploy:   { intent: [deploy], scope: [self-hosted], subject: [ticdc, next-gen, tiup, deploy, ssh], effect: write-nonprod }
+  ops/tidb-onebox:             { intent: [deploy], scope: [self-hosted], subject: [onebox, eks, aws, dev-environment], effect: write-nonprod }
+  ops/tcms-devbuild-rebuild:   { intent: [operate], subject: [tcms, devbuild, image, build], effect: write-nonprod }
+
+  # --------------------------------------------------------------- utilities
+  utilities/oncall-toolkit:
+    intent: [manage, report]
+    subject: [oncall, jira, pingkai, rca, ticket, close]
+    requires: [platform/jira-api]
+    effect: write-nonprod
+  utilities/oncall-api:
+    intent: [query, manage]
+    subject: [oncall, schedule, rotation, override, handover, who-is-on-call]
+    effect: write-nonprod
+    effect_min: read-only          # "who is on call" is a read
+  utilities/dedicated-cloud-toolkit:
+    intent: [operate]
+    scope: [dedicated]
+    subject: [dedicated, toolkit, query]
+    effect: write-nonprod
+    entry: true
+    explicit_only: true
+  utilities/manager:           { intent: [manage], subject: [agent, delegation, manager], effect: read-only, explicit_only: true }
+  utilities/db9:               { intent: [query], scope: ["*"], subject: [postgres, database, sql, migration, fixture], effect: write-nonprod }
+  utilities/dbgen-playground-import: { intent: [operate], scope: [self-hosted], subject: [dbgen, data-generation, playground, import-into, schema], effect: write-nonprod }
+  utilities/security:          { intent: [author], subject: [security, guardrail, approval, masking, audit], effect: read-only, role: gate }
+
+  # ---------------------------------------------------------------- security
+  security:
+    intent: [author]
+    subject: [security, guardrail, read-only, approval, destructive, masking]
+    effect: read-only
+    role: gate
+
+  # -------------------------------------------------------------- daily_work
+  daily_work/tcoc-incident-review:
+    intent: [report, inspect]
+    subject: [tcoc, incident, jira, review, classification]
+    requires: [platform/jira-api]
+    effect: write-nonprod
+    effect_min: read-only          # the review itself only reads; relabelling writes
+  daily_work/tcocp-rca-writer:
+    intent: [report]
+    subject: [rca, root-cause, tcocp, postmortem]
+    effect: read-only
+    explicit_only: true
+
+  # ------------------------------------------------------------------ finops
+  finops/alicloud-ecs-cpu-inventory: { intent: [inspect, report], subject: [alicloud, ecs, cpu, inventory, cost, idle], effect: read-only }
+  finops/create-skill:               { intent: [author], subject: [skill, authoring, skill-md, scaffold], effect: write-nonprod }
+
+  # ------------------------------------------------------------------ growth
+  growth/analyzing-tidb-x-growth:
+    intent: [report, query]
+    scope: [starter, essential, premium]
+    subject: [growth, bigquery, tenant, cluster-count, trend]
+    effect: read-only

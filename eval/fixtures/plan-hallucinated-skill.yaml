@@ -1,0 +1,9 @@
+plan_id: p_fixture_hallucinated
+goal: "diagnose a slow cluster"
+product_line: dedicated
+constraints: { read_only: true }
+steps:
+  - id: s1
+    skill: diagnosis/tikv-latency-analyzer
+    why: "sounds right, does not exist"
+    needs: []

@@ -1,0 +1,70 @@
+# The config layer rots silently: upstream renames a skill, moves it between
+# categories, or adds one nobody routes to, and nothing fails until a plan
+# references an id that no longer exists. This job makes that visible daily.
+name: catalog drift
+
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'config/**'
+      - 'scripts/**'
+      - 'eval/**'
+      - 'catalog/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check out nutshell-skills
+        uses: actions/checkout@v4
+        with:
+          repository: tidbcloud/nutshell-skills
+          path: .cache/nutshell-skills
+          token: ${{ secrets.NUTSHELL_SKILLS_TOKEN }}
+
+      - name: Rebuild catalog
+        run: node scripts/build-catalog.mjs
+
+      - name: Acceptance
+        run: bash scripts/smoke.sh
+
+      - name: Routing eval
+        run: node scripts/run-eval.mjs
+
+      - name: Report drift
+        id: drift
+        run: |
+          if git diff --quiet -- catalog/; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- catalog/ >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Drift is committed, not merely reported: catalog.json is checked in so
+      # that a reviewer can see exactly which skills appeared, vanished, or
+      # changed scope since yesterday.
+      - name: Open a drift PR
+        if: steps.drift.outputs.drift == 'true' && github.event_name != 'pull_request'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: bot/catalog-drift
+          title: 'catalog: sync with nutshell-skills HEAD'
+          commit-message: 'catalog: rebuild against nutshell-skills HEAD'
+          body: |
+            Automated rebuild of `catalog/` against `tidbcloud/nutshell-skills` HEAD.
+
+            Smoke and routing eval passed against the new catalog. Review the diff
+            for skills that were added (do they need a `routing-overlay.yaml`
+            entry?), removed (does any eval case still expect them?), or whose
+            scope changed.
+          add-paths: catalog/

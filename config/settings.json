@@ -1,0 +1,14 @@
+{
+  "$comment": "Set nutshellPath to point at an existing nutshell-skills checkout. Leave null to use .cache/nutshell-skills (created by `make sync`). NUTSHELL_SKILLS_PATH overrides this.",
+  "sourceRepo": "tidbcloud/nutshell-skills",
+  "nutshellPath": null,
+  "budget": {
+    "maxSteps": 8,
+    "maxContextTokens": 60000,
+    "maxIntakeQuestions": 4
+  },
+  "defaults": {
+    "mode": "guided",
+    "readOnly": true
+  }
+}

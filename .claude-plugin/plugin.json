@@ -1,0 +1,7 @@
+{
+  "name": "tidb-all-in-one",
+  "version": "0.1.0",
+  "description": "Goal-driven router over tidbcloud/nutshell-skills: state an objective and known conditions, get a validated plan of which TiDB skills to invoke, in what order, with prerequisites and safety gates filled in.",
+  "keywords": ["tidb", "tidb-cloud", "nutshell-skills", "routing", "oncall", "diagnosis"],
+  "author": { "name": "TiDB All-in-One" }
+}

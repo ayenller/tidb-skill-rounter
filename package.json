@@ -1,0 +1,14 @@
+{
+  "name": "tidb-all-in-one",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Goal-driven router over tidbcloud/nutshell-skills",
+  "scripts": {
+    "sync": "bash scripts/sync-source.sh",
+    "catalog": "node scripts/build-catalog.mjs",
+    "retrieve": "node scripts/retrieve.mjs",
+    "smoke": "bash scripts/smoke.sh"
+  },
+  "engines": { "node": ">=18" }
+}

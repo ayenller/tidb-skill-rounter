@@ -1,0 +1,20 @@
+# The same changefeed pause, but gated and explicitly not read-only.
+plan_id: p_fixture_gated_write
+goal: "pause the changefeed named orders-to-kafka on a Dedicated cluster"
+mode: guided
+product_line: dedicated
+constraints:
+  read_only: false
+steps:
+  - id: s1
+    skill: security
+    why: "gate: classify the write and its approval requirement before touching prod"
+    needs: []
+  - id: s2
+    skill: platform/devops-api
+    why: "resolve the changefeed display name to its numeric TiCDC id"
+    needs: [s1]
+  - id: s3
+    skill: ops/manage-ticdc-changefeeds
+    why: "pause it through the documented safe lifecycle"
+    needs: [s2]

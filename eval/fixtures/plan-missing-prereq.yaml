@@ -1,0 +1,9 @@
+plan_id: p_fixture_missing_prereq
+goal: "Starter cluster latency"
+product_line: starter
+constraints: { read_only: true }
+steps:
+  - id: s1
+    skill: platform/o11y-metrics-api
+    why: "grab metrics without authenticating first"
+    needs: []

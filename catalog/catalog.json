@@ -1,0 +1,2293 @@
+{
+  "schema": 1,
+  "generated_at": "2026-09-05T08:00:53.189Z",
+  "source": {
+    "repo": "tidbcloud/nutshell-skills",
+    "commit": "dddd54f",
+    "path": "/Users/huyule/Documents/claude_code/workspace/TiDB-All-in-One/.cache/nutshell-skills",
+    "origin": "vendored .cache"
+  },
+  "stats": {
+    "skill_count": 59,
+    "by_category": {
+      "daily_work": 2,
+      "diagnosis": 25,
+      "finops": 2,
+      "growth": 1,
+      "health_check": 1,
+      "ops": 7,
+      "platform": 13,
+      "security": 1,
+      "utilities": 7
+    },
+    "overlay_covered": 59,
+    "digest_tokens_total": 1843,
+    "full_tokens_total": 198944,
+    "bundle_tokens_total": 554559
+  },
+  "skills": [
+    {
+      "id": "daily_work/tcoc-incident-review",
+      "name": "tcoc-incident-review",
+      "path": "skills/daily_work/tcoc-incident-review/SKILL.md",
+      "category": "daily_work",
+      "summary": "Daily review of TCOC Jira Incident tickets.",
+      "description": "Daily review of TCOC Jira Incident tickets. Fetches recent Incident issues, analyzes title and description to identify mis-classified tickets that are not real incidents (quota requests, billing questions, feature requests, resource reservations, UI feedback, etc.), presents a review table for confirmation, then batch-updates issue types via Jira API. Use when: user asks to review/triage TCOC incidents, daily incident cleanup, or ticket type audit.",
+      "intent": [
+        "report",
+        "inspect"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tcoc",
+        "incident",
+        "jira",
+        "review",
+        "classification"
+      ],
+      "requires": [
+        "platform/jira-api"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 18,
+      "skill_tokens": 1501,
+      "bundle_tokens": 1501,
+      "bundle_files": 1
+    },
+    {
+      "id": "daily_work/tcocp-rca-writer",
+      "name": "tcocp-rca-writer",
+      "path": "skills/daily_work/tcocp-rca-writer/SKILL.md",
+      "category": "daily_work",
+      "summary": "Use ONLY when a TCOCP-styled RCA (root cause analysis) report is explicitly requested.",
+      "description": "Use ONLY when a TCOCP-styled RCA (root cause analysis) report is explicitly requested. Trigger phrase: \"Write an RCA for TCOCP\".",
+      "intent": [
+        "report"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "rca",
+        "root-cause",
+        "tcocp",
+        "postmortem"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": true,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 28,
+      "skill_tokens": 1999,
+      "bundle_tokens": 2403,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/autoscaler-dashboard",
+      "name": "autoscaler-dashboard",
+      "path": "skills/diagnosis/autoscaler-dashboard/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Use when evaluating HPA autoscaling quality or generating scaling report dashboards.",
+      "description": "Use when evaluating HPA autoscaling quality or generating scaling report dashboards. Covers scoring methodology, event detection algorithms, and report page generation for any HPA-managed component (coprocessor worker, TiFlash, TiDB, etc.). Trigger phrases: \"evaluate autoscaling\", \"scaling report\", \"HPA score\", \"how is the HPA performing\", \"generate scaling dashboard\", \"scaling quality\", \"coprocessor scaling\", \"autoscaler evaluation\". Do NOT use for general HPA configuration questions or Kubernetes autoscaling concepts.",
+      "intent": [
+        "inspect",
+        "report"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "hpa",
+        "autoscaling",
+        "scaling",
+        "dashboard",
+        "scoring"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 29,
+      "skill_tokens": 4507,
+      "bundle_tokens": 12538,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/dedicated-cloud-diag",
+      "name": "dedicated-cloud-diag",
+      "path": "skills/diagnosis/dedicated-cloud-diag/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Diagnose Dedicated Cloud infra-provider CR / resource lifecycle (Cluster, APPBox, VPC, VPCPeering, PrivateLinkService) with read-only evidence.",
+      "description": "Diagnose Dedicated Cloud infra-provider CR / resource lifecycle (Cluster, APPBox, VPC, VPCPeering, PrivateLinkService) with read-only evidence. Use when a Dedicated cluster is stuck Creating/Pending/Scaling, APPBox/VPC/Peering/PLS is not Active, or to confirm no current anomaly on those CRs. Do not use for TiKV/TiDB/PD/TiCDC deep performance, slow query, Serverless, inspections, or change execution. Prefer when this skill is explicitly requested.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "dedicated"
+      ],
+      "subject": [
+        "cr",
+        "lifecycle",
+        "vpc",
+        "peering",
+        "privatelink",
+        "appbox",
+        "stuck-creating"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "overlay",
+      "family": "dedicated-diag",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 44,
+      "skill_tokens": 1141,
+      "bundle_tokens": 12650,
+      "bundle_files": 36
+    },
+    {
+      "id": "diagnosis/pd-oncall-handbook",
+      "name": "pd-oncall-handbook",
+      "path": "skills/diagnosis/pd-oncall-handbook/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Entry skill for PD on-call diagnosis.",
+      "description": "Entry skill for PD on-call diagnosis. Use when triaging PD incidents involving placement rules, region health checks, scheduler behavior, resource control, TSO pressure, ETCD capacity, TLS, or Dashboard operational issues. Includes routing guidance, first-response checks, and links to specialized PD diagnosis skills.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "pd",
+        "oncall",
+        "triage",
+        "placement",
+        "scheduler",
+        "tso",
+        "etcd"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "default",
+      "family": "pd-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 16,
+      "skill_tokens": 919,
+      "bundle_tokens": 1771,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/pd-operations",
+      "name": "pd-operations",
+      "path": "skills/diagnosis/pd-operations/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for PD operational incidents.",
+      "description": "Reference handbook for PD operational incidents. Use when investigating ETCD capacity exhaustion, TLS rollout failures, Dashboard issues, Prometheus scrape gaps, PD leader CPU spikes, or TSO-related operational bottlenecks.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "pd",
+        "etcd",
+        "tls",
+        "dashboard",
+        "tso",
+        "prometheus"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "pd-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 17,
+      "skill_tokens": 1040,
+      "bundle_tokens": 2574,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/pd-placement-rules",
+      "name": "pd-placement-rules",
+      "path": "skills/diagnosis/pd-placement-rules/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for PD placement-rule and isolation-label incidents.",
+      "description": "Reference handbook for PD placement-rule and isolation-label incidents. Use when investigating placement-rule resets, SQL placement-policy interactions, location-label surprises, isolation-label gaps, or leader imbalance after large rule changes.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "pd",
+        "placement-rule",
+        "isolation-label",
+        "location-label"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "pd-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 25,
+      "skill_tokens": 1058,
+      "bundle_tokens": 1815,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/pd-resource-control",
+      "name": "pd-resource-control",
+      "path": "skills/diagnosis/pd-resource-control/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for PD resource-control incidents.",
+      "description": "Reference handbook for PD resource-control incidents. Use when investigating RU throttling, token-bucket behavior, long Time_queued_by_rc latency, resource-group quota errors, runaway detection gaps, or configuration changes that do not take effect.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "pd",
+        "ru",
+        "resource-control",
+        "token-bucket",
+        "throttling",
+        "runaway"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "pd-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 20,
+      "skill_tokens": 959,
+      "bundle_tokens": 2176,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/pd-scheduling",
+      "name": "pd-scheduling",
+      "path": "skills/diagnosis/pd-scheduling/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for PD scheduler and region-health incidents.",
+      "description": "Reference handbook for PD scheduler and region-health incidents. Use when investigating region checker behavior, patrol-region drift, scatter conflicts, balance-region storms, low-space rebalancing, evict-leader anomalies, or scheduler interactions after topology changes.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "pd",
+        "scheduler",
+        "region-health",
+        "balance",
+        "patrol",
+        "hot-region"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "pd-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 22,
+      "skill_tokens": 1234,
+      "bundle_tokens": 2473,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/ru-limit-inspection",
+      "name": "ru-limit-inspection",
+      "path": "skills/diagnosis/ru-limit-inspection/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Use for contract-driven, read-only inspection of TiDB resource-group RU limits on proven dedicated-classic-v1 deployments, including RU/s limit utilization, over-limit…",
+      "description": "Use for contract-driven, read-only inspection of TiDB resource-group RU limits on proven dedicated-classic-v1 deployments, including RU/s limit utilization, over-limit duration, RC wait, protected-workload progress, concurrency impact, and TiDB/TiKV pressure. Route other product profiles and controls not expressed through resource-group RU limits to their product-specific workflow.",
+      "intent": [
+        "inspect"
+      ],
+      "scope": [
+        "dedicated"
+      ],
+      "subject": [
+        "ru",
+        "resource-group",
+        "quota",
+        "throttling"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 50,
+      "skill_tokens": 1536,
+      "bundle_tokens": 8678,
+      "bundle_files": 5
+    },
+    {
+      "id": "diagnosis/ticdc-health-inspection",
+      "name": "ticdc-health-inspection",
+      "path": "skills/diagnosis/ticdc-health-inspection/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Use when auditing TiCDC health from metrics, especially for clinic.pingcap.com clusters.",
+      "description": "Use when auditing TiCDC health from metrics, especially for clinic.pingcap.com clusters. First distinguish TiCDC new arch from old arch by probing the `ticdc_maintainer_handle_event_duration` metric family; for new arch, use the full maintainer/dispatcher/scheduler rule set, and for old arch, use owner lag plus sink output and downstream latency rules.",
+      "intent": [
+        "inspect",
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "ticdc",
+        "changefeed",
+        "lag",
+        "replication",
+        "health"
+      ],
+      "requires": [
+        "platform/clinic-api"
+      ],
+      "requires_when": {},
+      "inputs": [
+        "cluster_id",
+        "time_window"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "default",
+      "family": "ticdc",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 30,
+      "skill_tokens": 2733,
+      "bundle_tokens": 9124,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/tidb-perf-diagnosis",
+      "name": "tidb-perf-diagnosis",
+      "path": "skills/diagnosis/tidb-perf-diagnosis/SKILL.md",
+      "category": "diagnosis",
+      "summary": "TiDB Cloud performance diagnosis and troubleshooting.",
+      "description": "TiDB Cloud performance diagnosis and troubleshooting. Use when diagnosing latency spikes, OOM, hotspots, slow queries, lock contention, scaling issues, or any performance problem on TiDB Cloud clusters. Covers both TiDB-X(starter,essential,Premium,BYOC) and Dedicated architectures. Uses a triage-then-read pattern: classify the problem first, then load only the relevant knowledge file(s) from the knowledge/ directory. Route TiCDC health incidents and transaction-specific oncall issues to dedicated diagnosis skills when they become the primary problem.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "dedicated",
+        "starter",
+        "essential",
+        "premium",
+        "byoc"
+      ],
+      "subject": [
+        "latency",
+        "p99",
+        "slow",
+        "oom",
+        "hotspot",
+        "slow-query",
+        "lock",
+        "contention",
+        "qps",
+        "performance"
+      ],
+      "requires": [],
+      "requires_when": {
+        "starter": [
+          "platform/o11y-metrics-api"
+        ],
+        "essential": [
+          "platform/o11y-metrics-api"
+        ],
+        "premium": [
+          "platform/clinic-api"
+        ],
+        "dedicated": [
+          "platform/clinic-api"
+        ],
+        "byoc": [
+          "platform/clinic-api"
+        ]
+      },
+      "inputs": [
+        "cluster_id",
+        "time_window"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "overlay",
+      "family": "perf",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 20,
+      "skill_tokens": 4689,
+      "bundle_tokens": 44596,
+      "bundle_files": 6
+    },
+    {
+      "id": "diagnosis/tidbcloud-dedicated-daily-inspection",
+      "name": "tidbcloud-dedicated-daily-inspection",
+      "path": "skills/diagnosis/tidbcloud-dedicated-daily-inspection/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Run daily inspection for TiDB Cloud Dedicated clusters, generate one English report section per cluster, and archive results into one date-based daily report document.",
+      "description": "Run daily inspection for TiDB Cloud Dedicated clusters, generate one English report section per cluster, and archive results into one date-based daily report document. Use when the user wants a reusable Dedicated inspection skill, needs a daily health report, wants to inspect one or more Dedicated cluster IDs, or wants to convert an internal inspection SOP into a public skill. Prefer clinic-api for metadata and metrics, use the bundled script to produce markdown evidence, then create or update the date-based Feishu report file.",
+      "intent": [
+        "inspect",
+        "report"
+      ],
+      "scope": [
+        "dedicated"
+      ],
+      "subject": [
+        "daily-inspection",
+        "report",
+        "health"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 55,
+      "skill_tokens": 2877,
+      "bundle_tokens": 6645,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/tidbcloud-serverless-daily-inspection",
+      "name": "tidbcloud-serverless-daily-inspection",
+      "path": "skills/diagnosis/tidbcloud-serverless-daily-inspection/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Run pool-wide TiKV daily inspections for TiDB Cloud Serverless shared pools and generate English, screenshot-free daily report sections.",
+      "description": "Run pool-wide TiKV daily inspections for TiDB Cloud Serverless shared pools and generate English, screenshot-free daily report sections. Use when inspecting Starter or Essential shared TiKV pools identified by control-plane and Kubernetes-cluster routing labels.",
+      "intent": [
+        "inspect",
+        "report"
+      ],
+      "scope": [
+        "starter",
+        "essential"
+      ],
+      "subject": [
+        "daily-inspection",
+        "report",
+        "tikv",
+        "shared-pool"
+      ],
+      "requires": [
+        "platform/tidbcloud-serverless-pool-routing"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 47,
+      "skill_tokens": 3894,
+      "bundle_tokens": 9651,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/tikv-cdc",
+      "name": "tikv-cdc",
+      "path": "skills/diagnosis/tikv-cdc/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV and TiCDC interaction issues.",
+      "description": "Reference handbook for TiKV and TiCDC interaction issues. Use when investigating CDC-triggered TiKV panic, changefeed lag, invalid PD endpoint reuse, store-address reuse, or CDC synchronization failures that depend on TiKV state.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "cdc",
+        "changefeed",
+        "panic"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 18,
+      "skill_tokens": 1006,
+      "bundle_tokens": 1431,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/tikv-fast-tune",
+      "name": "tikv-fast-tune",
+      "path": "skills/diagnosis/tikv-fast-tune/SKILL.md",
+      "category": "diagnosis",
+      "summary": "TiKV performance diagnosis using the Fast Tune methodology.",
+      "description": "TiKV performance diagnosis using the Fast Tune methodology. Provides a deterministic decision tree that an agent executes node-by-node to identify performance bottlenecks across TiKV's internal layers. Use when troubleshooting TiKV write/read latency, throughput drops, or jitter issues on any TiDB Cloud cluster.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "performance",
+        "bottleneck",
+        "latency",
+        "decision-tree",
+        "fast-tune"
+      ],
+      "requires": [],
+      "requires_when": {
+        "starter": [
+          "platform/o11y-metrics-api"
+        ],
+        "essential": [
+          "platform/o11y-metrics-api"
+        ],
+        "premium": [
+          "platform/clinic-api"
+        ],
+        "dedicated": [
+          "platform/clinic-api"
+        ],
+        "byoc": [
+          "platform/clinic-api"
+        ]
+      },
+      "inputs": [
+        "cluster_id",
+        "time_window"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 20,
+      "skill_tokens": 15809,
+      "bundle_tokens": 15809,
+      "bundle_files": 1
+    },
+    {
+      "id": "diagnosis/tikv-memory",
+      "name": "tikv-memory",
+      "path": "skills/diagnosis/tikv-memory/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference skill for TiKV memory analysis and OOM diagnosis.",
+      "description": "Reference skill for TiKV memory analysis and OOM diagnosis. Use when investigating TiKV memory growth, OOM, memory hotspots, heap profiles, resolved-ts memory pressure, coprocessor backlog, pessimistic-lock leaks, or swap-related memory anomalies.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "memory",
+        "oom",
+        "heap",
+        "profile"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 20,
+      "skill_tokens": 4418,
+      "bundle_tokens": 6030,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/tikv-oncall-handbook",
+      "name": "tikv-oncall-handbook",
+      "path": "skills/diagnosis/tikv-oncall-handbook/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Entry skill for TiKV on-call diagnosis.",
+      "description": "Entry skill for TiKV on-call diagnosis. Use when triaging TiKV incidents and deciding whether the problem belongs to panic/crash, raftstore and region lifecycle, unsafe recovery, storage and RocksDB/Titan, performance and flow-control, status-server profiling, or CDC. Includes routing guidance, first-response checks, and links to specialized TiKV diagnosis skills.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "oncall",
+        "triage",
+        "incident"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 17,
+      "skill_tokens": 1199,
+      "bundle_tokens": 2860,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/tikv-panic",
+      "name": "tikv-panic",
+      "path": "skills/diagnosis/tikv-panic/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV panic, crash, and restart-loop incidents.",
+      "description": "Reference handbook for TiKV panic, crash, and restart-loop incidents. Use when investigating SIGSEGV, abnormal restart, clock rollback, apply snapshot failure, missing SST files, PITR pause/resume panic, coprocessor response overflow, or other fatal TiKV process exits. Includes symptoms, log signatures, workarounds, and version notes.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "panic",
+        "crash",
+        "sigsegv",
+        "restart-loop"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 22,
+      "skill_tokens": 2201,
+      "bundle_tokens": 3275,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/tikv-performance",
+      "name": "tikv-performance",
+      "path": "skills/diagnosis/tikv-performance/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV gRPC, disk, flow-control, and large-region diagnosis.",
+      "description": "Reference handbook for TiKV gRPC, disk, flow-control, and large-region diagnosis. Use when investigating TiDB -> TiKV RPC long-tail latency, disk IOPS saturation, scheduler busy errors, flow-control throttling, load-based split imbalance, or large-region side effects.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "grpc",
+        "disk",
+        "iops",
+        "flow-control",
+        "latency"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 27,
+      "skill_tokens": 4412,
+      "bundle_tokens": 8945,
+      "bundle_files": 9
+    },
+    {
+      "id": "diagnosis/tikv-raftstore",
+      "name": "tikv-raftstore",
+      "path": "skills/diagnosis/tikv-raftstore/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV raftstore and region-lifecycle issues.",
+      "description": "Reference handbook for TiKV raftstore and region-lifecycle issues. Use when investigating split, add learner, snapshot, region relocation, peer cleanup, large-region scheduling, ingest SST during movement, or raft-log and peer-state related incidents. Includes diagnostic patterns, workarounds, and version notes.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "raftstore",
+        "region",
+        "split",
+        "snapshot",
+        "learner"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 22,
+      "skill_tokens": 4266,
+      "bundle_tokens": 5894,
+      "bundle_files": 4
+    },
+    {
+      "id": "diagnosis/tikv-recovery",
+      "name": "tikv-recovery",
+      "path": "skills/diagnosis/tikv-recovery/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV recovery and data-loss scenarios.",
+      "description": "Reference handbook for TiKV recovery and data-loss scenarios. Use when handling unsafe recovery, replica majority loss, orphan peers, TiFlash-related recovery blocking, tombstone operations, or SST recovery. Includes recovery paths, limitations, and operational cautions.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "recovery",
+        "data-loss",
+        "unsafe-recovery",
+        "tombstone"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 21,
+      "skill_tokens": 1910,
+      "bundle_tokens": 3948,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/tikv-scale",
+      "name": "tikv-scale",
+      "path": "skills/diagnosis/tikv-scale/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Diagnose TiKV scale-out and scale-in behavior in TiDB clusters.",
+      "description": "Diagnose TiKV scale-out and scale-in behavior in TiDB clusters. Use when investigating TiKV scale-out, scale-in, store online or offline transitions, slow data migration, slow operator creation, add-learner timeout, snapshot migration bottlenecks, offline or down store recovery, patrol-region or rule-checker scheduling problems, store state transitions, or when explaining TiKV node scaling behavior with PD and TiKV logs and metrics.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "scale-out",
+        "scale-in",
+        "store",
+        "migration",
+        "operator"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 20,
+      "skill_tokens": 1479,
+      "bundle_tokens": 5145,
+      "bundle_files": 3
+    },
+    {
+      "id": "diagnosis/tikv-slow-diagnosis",
+      "name": "tikv-slow-diagnosis",
+      "path": "skills/diagnosis/tikv-slow-diagnosis/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Diagnose TiKV-side latency regressions for Jira incidents or direct cluster investigations.",
+      "description": "Diagnose TiKV-side latency regressions for Jira incidents or direct cluster investigations. Use when the user asks to run `tikv-slow-diagnosis analyze {jira-issue-id}`, or wants to determine whether slowness is really on TiKV, whether it is on the read path or write path, which TiKV stage is slow first, which metrics prove it, or why TiKV leader drops happened and whether they were caused by PD scheduling, gRPC heartbeat delay, raftstore slowdown, network jitter, or node-level stalls, whether short-lived store-local latency spikes point to TiKV IO jitter on raft engine, RocksDB KV, or node / cloud-disk layers, whether transport latency comes from TiDB <-> TiKV or TiKV <-> TiKV network issues, or which exact flow-control / `ServerIsBusy` mechanism is rejecting or throttling work, or why hot-leader rebalance / scatter is slow because snapshot generation, delete-range backlog, or shared worker-pool pressure is blocking progress.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "slow",
+        "latency",
+        "regression",
+        "jira"
+      ],
+      "requires": [
+        "platform/jira-api"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 30,
+      "skill_tokens": 11793,
+      "bundle_tokens": 35618,
+      "bundle_files": 17
+    },
+    {
+      "id": "diagnosis/tikv-status-server",
+      "name": "tikv-status-server",
+      "path": "skills/diagnosis/tikv-status-server/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV status-server and profiling issues.",
+      "description": "Reference handbook for TiKV status-server and profiling issues. Use when investigating status-port access failures, TLS handshake errors, pprof deadlocks, profile collection failures, file-descriptor leaks, or slow backtrace collection through TiKV status interfaces.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "pprof",
+        "profiling",
+        "status-port",
+        "fd-leak"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 23,
+      "skill_tokens": 1225,
+      "bundle_tokens": 2192,
+      "bundle_files": 2
+    },
+    {
+      "id": "diagnosis/tikv-storage",
+      "name": "tikv-storage",
+      "path": "skills/diagnosis/tikv-storage/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiKV storage-engine and disk-related incidents.",
+      "description": "Reference handbook for TiKV storage-engine and disk-related incidents. Use when investigating RocksDB compaction pressure, Titan issues, disk exhaustion, SST corruption, pending compaction bytes growth, manifest rewrite cost, or storage permission and IO anomalies.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tikv",
+        "rocksdb",
+        "titan",
+        "compaction",
+        "sst",
+        "disk"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 23,
+      "skill_tokens": 2994,
+      "bundle_tokens": 4647,
+      "bundle_files": 4
+    },
+    {
+      "id": "diagnosis/transaction-oncall-handbook",
+      "name": "transaction-oncall-handbook",
+      "path": "skills/diagnosis/transaction-oncall-handbook/SKILL.md",
+      "category": "diagnosis",
+      "summary": "Reference handbook for TiDB Cloud transaction on-call diagnosis.",
+      "description": "Reference handbook for TiDB Cloud transaction on-call diagnosis. Use when investigating transaction-related issues: pessimistic lock bugs, async-commit correctness, stale/follower read anomalies, GC stalls, write hotspots, pipelined DML deadlocks, or client-go region-cache issues. Each entry documents phenomenon, root cause, workaround, fixed version, and related oncall tickets, covering TiDB/TiKV versions from v5.x to v8.5+.",
+      "intent": [
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "transaction",
+        "pessimistic-lock",
+        "async-commit",
+        "stale-read",
+        "gc"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": "tikv-oncall",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 25,
+      "skill_tokens": 13263,
+      "bundle_tokens": 25276,
+      "bundle_files": 13
+    },
+    {
+      "id": "finops/alicloud-ecs-cpu-inventory",
+      "name": "alicloud-ecs-cpu-inventory",
+      "path": "skills/finops/alicloud-ecs-cpu-inventory/SKILL.md",
+      "category": "finops",
+      "summary": "List Alibaba Cloud International ECS instances (AliCloud equivalent of EC2) for a specified aliyun CLI profile and region.",
+      "description": "List Alibaba Cloud International ECS instances (AliCloud equivalent of EC2) for a specified aliyun CLI profile and region. Outputs creation time, instance type/spec, last-7-day CPU utilization, unused-instance screening, and a sorted report under reports/. Use when user asks for 阿里云 ECS 清单, AliCloud EC2 list, ECS CPU usage, instance inventory with CPU metrics, or FinOps for Alibaba Cloud compute.",
+      "intent": [
+        "inspect",
+        "report"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "alicloud",
+        "ecs",
+        "cpu",
+        "inventory",
+        "cost",
+        "idle"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 40,
+      "skill_tokens": 1997,
+      "bundle_tokens": 2876,
+      "bundle_files": 2
+    },
+    {
+      "id": "finops/create-skill",
+      "name": "create-skill",
+      "path": "skills/finops/create-skill/SKILL.md",
+      "category": "finops",
+      "summary": "Create Cursor Agent Skills.",
+      "description": "Create Cursor Agent Skills. Use when authoring a new skill or asking about SKILL.md structure.",
+      "intent": [
+        "author"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "skill",
+        "authoring",
+        "skill-md",
+        "scaffold"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 12,
+      "skill_tokens": 3770,
+      "bundle_tokens": 3770,
+      "bundle_files": 1
+    },
+    {
+      "id": "growth/analyzing-tidb-x-growth",
+      "name": "analyzing-tidb-x-growth",
+      "path": "skills/growth/analyzing-tidb-x-growth/SKILL.md",
+      "category": "growth",
+      "summary": "Analyzes TiDB X cluster growth (Starter, Essential, Premium service plans) from the GCP BigQuery BI table.",
+      "description": "Analyzes TiDB X cluster growth (Starter, Essential, Premium service plans) from the GCP BigQuery BI table. Use when users ask for tenant cluster counts, daily new or cumulative cluster trends, high-volume tenants, service-plan distribution, or region distribution of TiDB X clusters.",
+      "intent": [
+        "report",
+        "query"
+      ],
+      "scope": [
+        "starter",
+        "essential",
+        "premium"
+      ],
+      "subject": [
+        "growth",
+        "bigquery",
+        "tenant",
+        "cluster-count",
+        "trend"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 35,
+      "skill_tokens": 1899,
+      "bundle_tokens": 4094,
+      "bundle_files": 5
+    },
+    {
+      "id": "health_check/tiflash-health-inspection",
+      "name": "tiflash-health-inspection",
+      "path": "skills/health_check/tiflash-health-inspection/SKILL.md",
+      "category": "health_check",
+      "summary": "Inspect TiFlash health for TiDB Cloud clusters from Clinic/O11Y metrics and generate a Markdown report.",
+      "description": "Inspect TiFlash health for TiDB Cloud clusters from Clinic/O11Y metrics and generate a Markdown report. Use for TiFlash health checks, bottleneck reports, or issues in query/MPP/resource/IO/Raft signals.",
+      "intent": [
+        "inspect",
+        "diagnose"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tiflash",
+        "mpp",
+        "query",
+        "health",
+        "report"
+      ],
+      "requires": [
+        "platform/clinic-api"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 35,
+      "skill_tokens": 8778,
+      "bundle_tokens": 16921,
+      "bundle_files": 3
+    },
+    {
+      "id": "ops/dedicated-cloud-ops",
+      "name": "dedicated-cloud-ops",
+      "path": "skills/ops/dedicated-cloud-ops/SKILL.md",
+      "category": "ops",
+      "summary": "Entry skill for Dedicated Cloud operations workflows.",
+      "description": "Entry skill for Dedicated Cloud operations workflows. Invoke only when this skill be explicitly requested. Routes requests to dedicated-cloud-ops sub-skills and executes the selected operational procedure.",
+      "intent": [
+        "operate"
+      ],
+      "scope": [
+        "dedicated"
+      ],
+      "subject": [
+        "dedicated",
+        "ops",
+        "procedure"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "write-prod",
+      "entry": true,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": true,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 20,
+      "skill_tokens": 658,
+      "bundle_tokens": 1659,
+      "bundle_files": 4
+    },
+    {
+      "id": "ops/deploy-tidbx",
+      "name": "deploy-tidbx",
+      "path": "skills/ops/deploy-tidbx/SKILL.md",
+      "category": "ops",
+      "summary": "Deploy a single-machine TiDBX cluster to a fresh remote machine over SSH using local tikv/pd/tidb tar.gz binaries, including dependency bootstrap (tiup/latest go/mysql…",
+      "description": "Deploy a single-machine TiDBX cluster to a fresh remote machine over SSH using local tikv/pd/tidb tar.gz binaries, including dependency bootstrap (tiup/latest go/mysql client/minio), MinIO startup, cse.yaml upload, tiup cluster deploy, binary patch, and cluster start with per-step success/failure reporting. Use when user asks for one-command setup on one new machine. For canonical AWS multi-node TiDB X clusters, use deploy-tidbx-aws-multinode instead.",
+      "intent": [
+        "deploy"
+      ],
+      "scope": [
+        "self-hosted"
+      ],
+      "subject": [
+        "tidbx",
+        "deploy",
+        "ssh",
+        "minio",
+        "single-machine"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 49,
+      "skill_tokens": 679,
+      "bundle_tokens": 679,
+      "bundle_files": 1
+    },
+    {
+      "id": "ops/deploy-tidbx-aws-multinode",
+      "name": "deploy-tidbx-aws-multinode",
+      "path": "skills/ops/deploy-tidbx-aws-multinode/SKILL.md",
+      "category": "ops",
+      "summary": "Deploy or review the canonical AWS EC2 multi-node TiDB X test shape: upstream nextgen PD/TiDB, cloud-engine TiKV and tikv-worker, real AWS S3 through a TiKV instance…",
+      "description": "Deploy or review the canonical AWS EC2 multi-node TiDB X test shape: upstream nextgen PD/TiDB, cloud-engine TiKV and tikv-worker, real AWS S3 through a TiKV instance profile, TiUP, and post-deploy validation. Use for empty TiDB X clusters built from prebuilt Linux artifacts.",
+      "intent": [
+        "deploy"
+      ],
+      "scope": [
+        "self-hosted"
+      ],
+      "subject": [
+        "tidbx",
+        "aws",
+        "ec2",
+        "multinode",
+        "s3",
+        "tiup"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 52,
+      "skill_tokens": 1630,
+      "bundle_tokens": 9749,
+      "bundle_files": 4
+    },
+    {
+      "id": "ops/manage-ticdc-changefeeds",
+      "name": "manage-ticdc-changefeeds",
+      "path": "skills/ops/manage-ticdc-changefeeds/SKILL.md",
+      "category": "ops",
+      "summary": "Manage and identify TiCDC changefeeds through `cdc cli`, OpenAPI v2, or TiDB Cloud Ops metadata.",
+      "description": "Manage and identify TiCDC changefeeds through `cdc cli`, OpenAPI v2, or TiDB Cloud Ops metadata. Use this skill to map an Ops Portal changefeed display name to its numeric TiCDC ID, create, list, query, pause, resume, remove, or update changefeeds, change `sink_uri`, translate between CLI flags, TOML config, and JSON payloads, and verify safe update workflows against the TiCDC repository or a live cluster.",
+      "intent": [
+        "operate",
+        "manage",
+        "query"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "ticdc",
+        "changefeed",
+        "sink-uri",
+        "pause",
+        "resume",
+        "create"
+      ],
+      "requires": [
+        "platform/devops-api"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 33,
+      "skill_tokens": 956,
+      "bundle_tokens": 6519,
+      "bundle_files": 4
+    },
+    {
+      "id": "ops/tcms-devbuild-rebuild",
+      "name": "tcms-devbuild-rebuild",
+      "path": "skills/ops/tcms-devbuild-rebuild/SKILL.md",
+      "category": "ops",
+      "summary": "Clone an existing PingCAP TCMS devbuild while preserving hidden build fields, override repository, git ref, version, product, or build options, and poll to a terminal…",
+      "description": "Clone an existing PingCAP TCMS devbuild while preserving hidden build fields, override repository, git ref, version, product, or build options, and poll to a terminal image result through an authenticated Chrome or Chromium profile. Use for PD, TiKV, CSE, TiDB, and other TCMS devbuild requests, especially when the new-build page omits effective fields such as githubRepo, a fork branch is rejected, or a teammate needs the final build id, Jenkins id, git hash, and image URLs.",
+      "intent": [
+        "operate"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "tcms",
+        "devbuild",
+        "image",
+        "build"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 51,
+      "skill_tokens": 1326,
+      "bundle_tokens": 1326,
+      "bundle_files": 1
+    },
+    {
+      "id": "ops/ticdc-next-gen-deploy",
+      "name": "ticdc-next-gen-deploy",
+      "path": "skills/ops/ticdc-next-gen-deploy/SKILL.md",
+      "category": "ops",
+      "summary": "Use when deploying or destroying a TiCDC next-gen test stack with TiUP, especially when you need SSH-based execution, configurable keyspace TiDB count, and optional…",
+      "description": "Use when deploying or destroying a TiCDC next-gen test stack with TiUP, especially when you need SSH-based execution, configurable keyspace TiDB count, and optional changefeed creation with auto sink-uri resolution.",
+      "intent": [
+        "deploy"
+      ],
+      "scope": [
+        "self-hosted"
+      ],
+      "subject": [
+        "ticdc",
+        "next-gen",
+        "tiup",
+        "deploy",
+        "ssh"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 50,
+      "skill_tokens": 1081,
+      "bundle_tokens": 2057,
+      "bundle_files": 2
+    },
+    {
+      "id": "ops/tidb-onebox",
+      "name": "tidb-onebox",
+      "path": "skills/ops/tidb-onebox/SKILL.md",
+      "category": "ops",
+      "summary": "How to deploy, validate, pause/resume, and destroy a TiDB-X on EKS dev environment using the one-box repo.",
+      "description": "How to deploy, validate, pause/resume, and destroy a TiDB-X on EKS dev environment using the one-box repo. Use when: creating a TiDB-X cluster on AWS EKS; running SQL validation against TiKV; pausing or resuming a one-box environment; destroying the one-box dev environment; refreshing EKS kubeconfig after SSO expiry.",
+      "intent": [
+        "deploy"
+      ],
+      "scope": [
+        "self-hosted"
+      ],
+      "subject": [
+        "onebox",
+        "eks",
+        "aws",
+        "dev-environment"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 32,
+      "skill_tokens": 3270,
+      "bundle_tokens": 5832,
+      "bundle_files": 3
+    },
+    {
+      "id": "platform/alertstore-api",
+      "name": "alertstore-api",
+      "path": "skills/platform/alertstore-api/SKILL.md",
+      "category": "platform",
+      "summary": "Query and manage alerts in alertstore — the single source of truth for TiDB Cloud operational alerts.",
+      "description": "Query and manage alerts in alertstore — the single source of truth for TiDB Cloud operational alerts. Use this skill whenever the user asks about alerts, alert lifecycle (ack, resolve, assign), alert subscriptions, mute rules, or alertstore events. Also use when the user mentions alertstore, alert state, or wants to look up an alert by ID (ALT-* format). Covers all three environments (prod, staging, dev).",
+      "intent": [
+        "query",
+        "manage"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "alert",
+        "alerting",
+        "incident",
+        "ack",
+        "resolve",
+        "silence"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 32,
+      "skill_tokens": 2850,
+      "bundle_tokens": 2850,
+      "bundle_files": 1
+    },
+    {
+      "id": "platform/clinic-api",
+      "name": "clinic-api",
+      "path": "skills/platform/clinic-api/SKILL.md",
+      "category": "platform",
+      "summary": "Query PingCAP Clinic cluster metadata and observability data through canonical Data Proxy APIs plus capability-preserving compatibility helpers where migration is…",
+      "description": "Query PingCAP Clinic cluster metadata and observability data through canonical Data Proxy APIs plus capability-preserving compatibility helpers where migration is incomplete. Routes to sub-skills for metadata/components, SQL and Top RU, BYOC diagnostics, Prometheus metrics, Loki logs, activity events, continuous profiling, and diagnostic files. Requires Internal API Key authentication.",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "dedicated",
+        "byoc",
+        "starter",
+        "essential",
+        "premium"
+      ],
+      "subject": [
+        "metadata",
+        "metrics",
+        "logs",
+        "slow-query",
+        "top-sql",
+        "topology",
+        "component",
+        "profiling"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [
+        "org_id",
+        "cluster_id"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "overlay",
+      "family": "clinic",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 47,
+      "skill_tokens": 3387,
+      "bundle_tokens": 95332,
+      "bundle_files": 16
+    },
+    {
+      "id": "platform/devops-api",
+      "name": "devops-api",
+      "path": "skills/platform/devops-api/SKILL.md",
+      "category": "platform",
+      "summary": "Also named Ops Portal, handle software delivery, operations, cluster tasks, and incidents.",
+      "description": "Also named Ops Portal, handle software delivery, operations, cluster tasks, and incidents. Includes: List, inspect, create, update, and cancel Release Change records; release software; Query tenant/cluster information and TiCDC changefeed display-name metadata, Query and create incidents, Operate cluster, Manage bastions (alias Jump Service).",
+      "intent": [
+        "operate",
+        "query",
+        "manage"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "release",
+        "deployment",
+        "tenant",
+        "cluster",
+        "ticdc",
+        "bastion",
+        "incident",
+        "ops-portal"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "read-only",
+      "entry": true,
+      "scope_source": "default",
+      "family": "devops",
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 28,
+      "skill_tokens": 1911,
+      "bundle_tokens": 26449,
+      "bundle_files": 17
+    },
+    {
+      "id": "platform/jira-api",
+      "name": "jira-api",
+      "path": "skills/platform/jira-api/SKILL.md",
+      "category": "platform",
+      "summary": "Team-shareable Jira REST API skill for accessing PingCAP Jira, searching issues, understanding key support/oncall/DM projects and custom fields, escalating support…",
+      "description": "Team-shareable Jira REST API skill for accessing PingCAP Jira, searching issues, understanding key support/oncall/DM projects and custom fields, escalating support tickets to GTOC/TCOC, and creating DM tasks safely.",
+      "intent": [
+        "query",
+        "manage"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "jira",
+        "ticket",
+        "issue",
+        "escalation",
+        "gtoc",
+        "tcoc",
+        "support"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 47,
+      "skill_tokens": 8416,
+      "bundle_tokens": 8416,
+      "bundle_files": 1
+    },
+    {
+      "id": "platform/o11y-auth",
+      "name": "o11y-auth",
+      "path": "skills/platform/o11y-auth/SKILL.md",
+      "category": "platform",
+      "summary": "Authenticate to the TiDB Cloud O11Y (Observability) platform via GitHub PAT.",
+      "description": "Authenticate to the TiDB Cloud O11Y (Observability) platform via GitHub PAT. Returns a bearer token for data-export APIs, an auth0_token for the O11Y control plane, and AWS STS credentials for S3 access. Also provides the resolve_biz_type helper for mapping cluster deployType to O11Y bizType. Use when: authenticating to any O11Y service, resolving bizType from deployType, or any task that needs O11Y tokens or AWS credentials. Trigger phrases: \"o11y auth\", \"o11y token\", \"data export token\", \"resolve biz type\", \"bizType mapping\", \"GitHub PAT for o11y\".",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "auth",
+        "token",
+        "credential",
+        "github-pat",
+        "sts"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [
+        "github_pat"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 24,
+      "skill_tokens": 1270,
+      "bundle_tokens": 1270,
+      "bundle_files": 1
+    },
+    {
+      "id": "platform/o11y-data",
+      "name": "o11y-data",
+      "path": "skills/platform/o11y-data/SKILL.md",
+      "category": "platform",
+      "summary": "Access TiDB Cloud O11Y (Observability) data: authenticate via GitHub PAT, query cluster info and Prometheus metrics via API, access S3/GCS logs/slowlogs/statements,…",
+      "description": "Access TiDB Cloud O11Y (Observability) data: authenticate via GitHub PAT, query cluster info and Prometheus metrics via API, access S3/GCS logs/slowlogs/statements, query Loki for real-time logs. Covers Dedicated, Premium, Starter/Essential, and BYOC tiers with different data layouts. Use when: querying cluster metrics, downloading logs, analyzing slowlogs, investigating log-stats, accessing statement logs, exploring O11Y storage data, diagnosing TiDB Cloud cluster issues, checking cluster observability data, querying Loki logs, profiling data access. Trigger phrases: \"o11y data\", \"cluster logs\", \"download logs\", \"log stats\", \"slowlog analysis\", \"statement logs\", \"cluster metrics\", \"prometheus query\", \"o11y s3\", \"observability data\", \"TiDB logs\", \"loki query\", \"profiling data\", \"topsql\", \"control plane logs\".",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "dedicated",
+        "starter",
+        "essential",
+        "premium",
+        "byoc"
+      ],
+      "subject": [
+        "metrics",
+        "logs",
+        "slowlog",
+        "statements",
+        "s3",
+        "gcs",
+        "loki"
+      ],
+      "requires": [
+        "platform/o11y-auth"
+      ],
+      "requires_when": {},
+      "inputs": [
+        "cluster_id",
+        "time_window"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 47,
+      "skill_tokens": 6876,
+      "bundle_tokens": 6876,
+      "bundle_files": 1
+    },
+    {
+      "id": "platform/o11y-data-export",
+      "name": "o11y-data-export",
+      "path": "skills/platform/o11y-data-export/SKILL.md",
+      "category": "platform",
+      "summary": "Create, manage O11Y monitoring pipelines (integration tasks) for TiDB Cloud Clusters.",
+      "description": "Create, manage O11Y monitoring pipelines (integration tasks) for TiDB Cloud Clusters. Use when: creating monitoring pipelines, exporting slow queries, exporting raw logs, exporting SQL statements, setting up monitoring pipelines, accessing exported S3 data, data export to S3, pipeline management, or anything involving the monitoringPipelines API. Trigger phrases: \"monitoring pipeline\", \"export slow query\", \"export raw log\", \"export sql statement\", \"data export\", \"s3 export\", \"create pipeline\", \"monitoringPipelines\".",
+      "intent": [
+        "manage"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "pipeline",
+        "export",
+        "integration",
+        "slow-query",
+        "raw-log"
+      ],
+      "requires": [
+        "platform/o11y-auth"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "write-prod",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 28,
+      "skill_tokens": 1442,
+      "bundle_tokens": 1442,
+      "bundle_files": 1
+    },
+    {
+      "id": "platform/o11y-metrics-api",
+      "name": "o11y-metrics-api",
+      "path": "skills/platform/o11y-metrics-api/SKILL.md",
+      "category": "platform",
+      "summary": "Query TiDB Cloud O11Y (Observability) metrics via Prometheus-compatible API.",
+      "description": "Query TiDB Cloud O11Y (Observability) metrics via Prometheus-compatible API. Use when fetching TiDB cluster metrics, K8s node metrics, or any O11Y data.",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "metrics",
+        "prometheus",
+        "promql",
+        "timeseries",
+        "k8s-node"
+      ],
+      "requires": [
+        "platform/o11y-auth"
+      ],
+      "requires_when": {
+        "starter": [
+          "platform/tidbcloud-serverless-pool-routing"
+        ],
+        "essential": [
+          "platform/tidbcloud-serverless-pool-routing"
+        ]
+      },
+      "inputs": [
+        "cluster_id",
+        "time_window"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 25,
+      "skill_tokens": 4648,
+      "bundle_tokens": 4648,
+      "bundle_files": 1
+    },
+    {
+      "id": "platform/op-clinic-grafana-access",
+      "name": "op-clinic-grafana-access",
+      "path": "skills/platform/op-clinic-grafana-access/SKILL.md",
+      "category": "platform",
+      "summary": "Access On-Premises PingCAP Clinic and online Grafana data by reusing a local Chrome login session, discovering dashboard and panel PromQL from Grafana dashboard JSON,…",
+      "description": "Access On-Premises PingCAP Clinic and online Grafana data by reusing a local Chrome login session, discovering dashboard and panel PromQL from Grafana dashboard JSON, and preparing normalized query inputs and evidence payloads for TiDB diagnosis workflows. Use when a user provides an On-Premises Clinic cluster link, an online Grafana dashboard link, or a Clinic bundle workflow rooted at a portal link and needs monitoring data access, dashboard discovery, cluster-summary normalization, or bundle/log evidence extraction. Local Clinic auth here depends on a browser cookie from a real Chrome login session instead of API-key auth.",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "self-hosted"
+      ],
+      "subject": [
+        "grafana",
+        "dashboard",
+        "on-premises",
+        "panel",
+        "promql"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [
+        "chrome_session"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 52,
+      "skill_tokens": 5040,
+      "bundle_tokens": 6613,
+      "bundle_files": 4
+    },
+    {
+      "id": "platform/tidbcloud-api",
+      "name": "tidbcloud-api",
+      "path": "skills/platform/tidbcloud-api/SKILL.md",
+      "category": "platform",
+      "summary": "Interact with TiDB Cloud TiDBX APIs for Starter, Essential, and Premium tiers.",
+      "description": "Interact with TiDB Cloud TiDBX APIs for Starter, Essential, and Premium tiers. Use when user asks to create, delete, list, or manage TiDB Cloud clusters, run SQL against TiDB Cloud databases, manage backups, or explore TiDB Cloud OpenAPI operations. Trigger phrases: \"create a tidbx cluster\", \"delete my tidb cloud cluster\", \"list clusters\", \"tidbx req:\", \"tidb cloud API\", \"manage tidb premium cluster\", \"explore tidbcloud openapi\". Do NOT use for Dedicated tier clusters or general database questions unrelated to TiDB Cloud management.",
+      "intent": [
+        "manage",
+        "query"
+      ],
+      "scope": [
+        "starter",
+        "essential",
+        "premium"
+      ],
+      "subject": [
+        "cluster",
+        "branch",
+        "sql",
+        "api-key",
+        "backup"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "write-prod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 25,
+      "skill_tokens": 2980,
+      "bundle_tokens": 3527,
+      "bundle_files": 2
+    },
+    {
+      "id": "platform/tidbcloud-cli",
+      "name": "tidbcloud-cli",
+      "path": "skills/platform/tidbcloud-cli/SKILL.md",
+      "category": "platform",
+      "summary": "Use this skill when users want to operate TiDB Cloud resources through the ticloud CLI.",
+      "description": "Use this skill when users want to operate TiDB Cloud resources through the ticloud CLI. Covers the full CLI command surface, keeps resource operations interactive-first, and handles authentication via API key profiles or OAuth login.",
+      "intent": [
+        "manage"
+      ],
+      "scope": [
+        "starter",
+        "essential",
+        "premium",
+        "dedicated"
+      ],
+      "subject": [
+        "cluster",
+        "cli",
+        "ticloud",
+        "backup",
+        "import",
+        "export"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 28,
+      "skill_tokens": 3101,
+      "bundle_tokens": 50965,
+      "bundle_files": 130
+    },
+    {
+      "id": "platform/tidbcloud-http",
+      "name": "tidbcloud-http",
+      "path": "skills/platform/tidbcloud-http/SKILL.md",
+      "category": "platform",
+      "summary": "Call TiDB Serverless HTTP endpoint directly, without SDK/driver.",
+      "description": "Call TiDB Serverless HTTP endpoint directly, without SDK/driver. Supports stateless, stateful, and transaction query flows. Use when users ask for raw SQL over HTTP or want to bypass @tidbcloud/serverless.",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "starter",
+        "essential"
+      ],
+      "subject": [
+        "sql",
+        "http",
+        "serverless-driver",
+        "transaction"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-prod",
+      "effect_min": "write-prod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 22,
+      "skill_tokens": 1364,
+      "bundle_tokens": 3624,
+      "bundle_files": 4
+    },
+    {
+      "id": "platform/tidbcloud-serverless-pool-routing",
+      "name": "tidbcloud-serverless-pool-routing",
+      "path": "skills/platform/tidbcloud-serverless-pool-routing/SKILL.md",
+      "category": "platform",
+      "summary": "Resolve a TiDB Cloud Serverless (Starter/Essential) shared-pool name such as us-west-2-f01 into the routing identities (pool, vendor, vendor-region, control_plane_info)…",
+      "description": "Resolve a TiDB Cloud Serverless (Starter/Essential) shared-pool name such as us-west-2-f01 into the routing identities (pool, vendor, vendor-region, control_plane_info) required by the serverless parent metrics and logs APIs. Use when querying metrics or logs for a serverless/starter/essential/essential-v1 pool and the caller only gives a region pool name like us-west-2-f01 or na-south-1-a01.",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "starter",
+        "essential"
+      ],
+      "subject": [
+        "pool",
+        "routing",
+        "vendor-region",
+        "control-plane-info",
+        "shared-pool"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [
+        "pool_or_cluster_id"
+      ],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 54,
+      "skill_tokens": 1594,
+      "bundle_tokens": 1594,
+      "bundle_files": 1
+    },
+    {
+      "id": "security",
+      "name": "security",
+      "path": "skills/security/SKILL.md",
+      "category": "security",
+      "summary": "Security guardrails for AI agents operating in restricted multi-cloud DBaaS environments.",
+      "description": "Security guardrails for AI agents operating in restricted multi-cloud DBaaS environments. Use when handling cloud or database operational work that requires deciding whether an action is read-only, non-production write, production write, or destructive; when evaluating whether human approval is required; when masking secrets or customer data; or when constraining network/tool usage in enterprise environments. Trigger phrases: \"security guardrail\", \"is this safe to run\", \"needs approval\", \"prod write\", \"destructive action\", \"mask secrets\", \"multi-cloud DBaaS security\", \"read-only vs write\".",
+      "intent": [
+        "author"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "security",
+        "guardrail",
+        "read-only",
+        "approval",
+        "destructive",
+        "masking"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "gate",
+      "overlay": true,
+      "digest_tokens": 27,
+      "skill_tokens": 752,
+      "bundle_tokens": 2045,
+      "bundle_files": 2
+    },
+    {
+      "id": "utilities/db9",
+      "name": "db9",
+      "path": "skills/utilities/db9/SKILL.md",
+      "category": "utilities",
+      "summary": "Instant serverless Postgres databases via the db9 CLI.",
+      "description": "Instant serverless Postgres databases via the db9 CLI. Use when user asks to: create a database, run SQL queries, validate DDL, manage migrations, branch a database, generate types from schema, inspect metrics, sort or filter large datasets, analyze logs or test results with SQL, traverse dependency graphs, detect config drift across environments, generate test fixtures, or prototype with a real database backend. Also use when the agent needs to verify SQL correctness, offload data processing to save tokens, or load artifacts into a database for querying. Do NOT use when the project already has a local database or Docker Compose setup, or when the task has no database interaction.",
+      "intent": [
+        "query"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "postgres",
+        "database",
+        "sql",
+        "migration",
+        "fixture"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 16,
+      "skill_tokens": 3079,
+      "bundle_tokens": 3820,
+      "bundle_files": 2
+    },
+    {
+      "id": "utilities/dbgen-playground-import",
+      "name": "dbgen-playground-import",
+      "path": "skills/utilities/dbgen-playground-import/SKILL.md",
+      "category": "utilities",
+      "summary": "Generate dbgen templates from user-provided table schemas, representative SQL, and EXPLAIN or statistics evidence, then validate them by generating CSVs, starting a…",
+      "description": "Generate dbgen templates from user-provided table schemas, representative SQL, and EXPLAIN or statistics evidence, then validate them by generating CSVs, starting a local TiDB playground, creating tables from the supplied schema, importing with IMPORT INTO, and checking representative joins or query samples. Use when the user wants an end-to-end workflow for \"schema/sql/plan -> dbgen data -> playground import -> verification\", especially for TiDB or MySQL-compatible workloads, load-simulation data generation, join-heavy queries, skewed workloads, or import validation in a customer-local environment. The workload may be multi-tenant, single-tenant, region-sharded, time-bucketed, or organized by some other grouping dimension.",
+      "intent": [
+        "operate"
+      ],
+      "scope": [
+        "self-hosted"
+      ],
+      "subject": [
+        "dbgen",
+        "data-generation",
+        "playground",
+        "import-into",
+        "schema"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 51,
+      "skill_tokens": 3238,
+      "bundle_tokens": 6016,
+      "bundle_files": 5
+    },
+    {
+      "id": "utilities/dedicated-cloud-toolkit",
+      "name": "dedicated-cloud-toolkit",
+      "path": "skills/utilities/dedicated-cloud-toolkit/SKILL.md",
+      "category": "utilities",
+      "summary": "Entry skill for Dedicated Cloud toolkit.",
+      "description": "Entry skill for Dedicated Cloud toolkit. Invoke only when this skill be explicitly requested. Routes requests to executable sub-skills and executes the selected procedure. Includes: read-only query actions and change operation actions.",
+      "intent": [
+        "operate"
+      ],
+      "scope": [
+        "dedicated"
+      ],
+      "subject": [
+        "dedicated",
+        "toolkit",
+        "query"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": true,
+      "scope_source": "overlay",
+      "family": null,
+      "explicit_only": true,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 18,
+      "skill_tokens": 483,
+      "bundle_tokens": 6680,
+      "bundle_files": 9
+    },
+    {
+      "id": "utilities/manager",
+      "name": "manager",
+      "path": "skills/utilities/manager/SKILL.md",
+      "category": "utilities",
+      "summary": "显式将当前主 Agent 切换为管理角色，由其他 agents 执行具体工作。仅在用户调用 $manager 时使用。",
+      "description": "显式将当前主 Agent 切换为管理角色，由其他 agents 执行具体工作。仅在用户调用 $manager 时使用。",
+      "intent": [
+        "manage"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "agent",
+        "delegation",
+        "manager"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": true,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 45,
+      "skill_tokens": 546,
+      "bundle_tokens": 546,
+      "bundle_files": 1
+    },
+    {
+      "id": "utilities/oncall-api",
+      "name": "oncall-api",
+      "path": "skills/utilities/oncall-api/SKILL.md",
+      "category": "utilities",
+      "summary": "Drive the oncall service's REST API directly (instead of clicking through the web UI) to read and manage on-call duty.",
+      "description": "Drive the oncall service's REST API directly (instead of clicking through the web UI) to read and manage on-call duty. Use this whenever the user wants to know who is on call, view or edit an on-call rotation/schedule, swap or override a shift (\"cover X's shift\", \"put me on call next week\", \"I'm out Friday\"), add or remove team members or managers, set up a backup lane or a reference layer, find the system caller-ID phone numbers, or send a Feishu handover/privilege notification — even when they don't mention \"the API\" by name. Triggers on \"who's on call for payments\", \"change the rotation\", \"page the on-call engineer\", \"oncall schedule\", \"on-call team\". This is the company's internal oncall system at oncall.pingcap.net, not a generic paging tool and not the Jira/Pingkai oncall-toolkit ticket workflow.",
+      "intent": [
+        "query",
+        "manage"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "oncall",
+        "schedule",
+        "rotation",
+        "override",
+        "handover",
+        "who-is-on-call"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 35,
+      "skill_tokens": 1889,
+      "bundle_tokens": 4727,
+      "bundle_files": 2
+    },
+    {
+      "id": "utilities/oncall-toolkit",
+      "name": "oncall-toolkit",
+      "path": "skills/utilities/oncall-toolkit/SKILL.md",
+      "category": "utilities",
+      "summary": "Oncall workflow assistant for Jira and Pingkai tickets: report, RCA generation, filtered Jira or Pingkai issue listing, Jira close flows with preview or direct…",
+      "description": "Oncall workflow assistant for Jira and Pingkai tickets: report, RCA generation, filtered Jira or Pingkai issue listing, Jira close flows with preview or direct execution, ticket-driven diagnosis routing through related skills, and evaluator-ready case discovery for diagnosis benchmark flows such as tikv-slow. Use when the user asks to run `oncall-toolkit report ...`, `oncall-toolkit RCA {jira-issue-id}`, `oncall-toolkit list ...`, `oncall-toolkit analyze {jira-issue-id}`, `oncall-toolkit evaluate tikv-slow ...`, or `oncall-toolkit close [--preview|--no-preview] {jira-issue-id}` for TCOC/GTOC-style Jira tickets or Pingkai `ticket-xxxx` / `TICKET-xxxx` style support tickets. In flag-style filter forms, use `--assignee` as the user-facing flag name. For Jira-facing actions, prefer `jira-cli` as the primary execution path and use direct Jira REST API only as a fallback when CLI output is unavailable or insufficient.",
+      "intent": [
+        "manage",
+        "report"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "oncall",
+        "jira",
+        "pingkai",
+        "rca",
+        "ticket",
+        "close"
+      ],
+      "requires": [
+        "platform/jira-api"
+      ],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "write-nonprod",
+      "effect_min": "write-nonprod",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "none",
+      "overlay": true,
+      "digest_tokens": 47,
+      "skill_tokens": 20607,
+      "bundle_tokens": 20607,
+      "bundle_files": 1
+    },
+    {
+      "id": "utilities/security",
+      "name": "security",
+      "path": "skills/utilities/security/SKILL.md",
+      "category": "utilities",
+      "summary": "AI agent security guardrails for operating in a restricted multi-cloud DBaaS environment.",
+      "description": "AI agent security guardrails for operating in a restricted multi-cloud DBaaS environment. Use when defining or applying controls around identity, network access, approvals, data masking, auditability, and production boundaries.",
+      "intent": [
+        "author"
+      ],
+      "scope": [
+        "*"
+      ],
+      "subject": [
+        "security",
+        "guardrail",
+        "approval",
+        "masking",
+        "audit"
+      ],
+      "requires": [],
+      "requires_when": {},
+      "inputs": [],
+      "effect": "read-only",
+      "effect_min": "read-only",
+      "entry": false,
+      "scope_source": "default",
+      "family": null,
+      "explicit_only": false,
+      "role": "gate",
+      "overlay": true,
+      "digest_tokens": 27,
+      "skill_tokens": 1365,
+      "bundle_tokens": 1365,
+      "bundle_files": 1
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+plan_id: p_fixture_wrong_line
+goal: "check RU limits on a Starter cluster"
+product_line: starter
+constraints: { read_only: true }
+steps:
+  - id: s1
+    skill: diagnosis/ru-limit-inspection
+    why: "dedicated-only skill applied to Starter"
+    needs: []

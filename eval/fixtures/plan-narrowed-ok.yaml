@@ -1,0 +1,22 @@
+# The demo case that the first verifier could not express: read one Jira ticket
+# under a read-only constraint, using a skill that can also escalate.
+plan_id: p_fixture_narrowed_ok
+goal: "read TCOC-4821 and check whether the changefeed lag is a real health problem"
+product_line: dedicated
+constraints:
+  read_only: true
+steps:
+  - id: s1
+    skill: platform/jira-api
+    effect: read-only
+    effect_justification: "search + read TCOC-4821 only; no escalation, no field write, no issue link"
+    why: "get the reported symptom, cluster id and timeline from the ticket"
+    needs: []
+  - id: s2
+    skill: platform/clinic-api
+    why: "TiCDC health inspection reads its metrics through Clinic"
+    needs: [s1]
+  - id: s3
+    skill: diagnosis/ticdc-health-inspection
+    why: "architecture-aware metric rules decide whether the lag is real"
+    needs: [s2]

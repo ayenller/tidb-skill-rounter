@@ -1,0 +1,28 @@
+# DESIGN.md walkthrough 1, as the planner subagent would emit it.
+plan_id: p_fixture_starter_latency
+goal: "Starter 集群 P99 从 20ms 涨到 300ms，昨天下午开始变慢"
+mode: guided
+product_line: starter
+constraints:
+  read_only: true
+steps:
+  - id: s1
+    skill: platform/o11y-auth
+    why: "o11y-metrics-api needs a bearer token"
+    needs: []
+  - id: s2
+    skill: platform/tidbcloud-serverless-pool-routing
+    why: "resolve the Starter cluster to its shared pool and control_plane_info"
+    needs: []
+  - id: s3
+    skill: platform/o11y-metrics-api
+    why: "pull P99 and gRPC duration for the incident window"
+    needs: [s1, s2]
+  - id: s4
+    skill: diagnosis/tidb-perf-diagnosis
+    why: "entry skill: classify the symptom before loading a leaf handbook"
+    needs: [s3]
+  - id: s5
+    skill: diagnosis/tikv-fast-tune
+    why: "decision tree down to the responsible TiKV layer"
+    needs: [s4]

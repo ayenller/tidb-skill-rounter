@@ -1,0 +1,12 @@
+# ticdc-next-gen-deploy never has a read-only surface, so no step may claim one.
+plan_id: p_fixture_narrowed_forbidden
+goal: "have a look at the next-gen TiCDC test stack"
+product_line: self-hosted
+constraints: { read_only: true }
+steps:
+  - id: s1
+    skill: ops/ticdc-next-gen-deploy
+    effect: read-only
+    effect_justification: "I promise I will only look at it and not deploy anything"
+    why: "inspect the stack"
+    needs: []

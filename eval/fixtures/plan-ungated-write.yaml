@@ -1,0 +1,13 @@
+plan_id: p_fixture_ungated_write
+goal: "pause a changefeed"
+product_line: dedicated
+constraints: { read_only: false }
+steps:
+  - id: s1
+    skill: platform/devops-api
+    why: "resolve the changefeed display name to its numeric id"
+    needs: []
+  - id: s2
+    skill: ops/manage-ticdc-changefeeds
+    why: "pause it"
+    needs: [s1]

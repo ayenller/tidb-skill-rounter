@@ -1,0 +1,319 @@
+# Routing eval set.
+#
+# Each case is a goal stated the way an operator would actually state it, plus
+# what a correct shortlist must contain. Expectations are grounded in the
+# upstream skill descriptions, not in what feels plausible: if you cannot point
+# at the sentence in a SKILL.md that covers the goal, the case is wrong, not the
+# router.
+#
+# Fields:
+#   goal          the query, verbatim, in the language an operator would use
+#   product_line  optional; omit to test routing without that slot
+#   intent        optional
+#   expect_must   every one of these must appear in the top 3
+#   expect_any    at least one of these must appear in the top 5
+#   expect_never  none of these may appear anywhere in the shortlist. Reserved
+#                 for scope violations (a dedicated-only skill offered for a
+#                 Starter cluster), NOT for plausible near-neighbours - pruning
+#                 those is the model's job in stage 2, not the coarse filter's.
+#   expect_prereq every one of these must be in the auto-inserted prerequisites
+#   expect_signal strong | weak | none - how much of what the operator said
+#                 actually overlapped the top candidate.
+#
+#                 Asserted ONLY on negative cases, where the point is that the
+#                 router can say it does not know. It is deliberately NOT
+#                 asserted on positive cases: signal measures keyword overlap,
+#                 not correctness, and short Chinese goals routinely route
+#                 correctly on one concept of overlap or none at all (see c40,
+#                 c43). Gating execution on signal alone would be wrong.
+#
+# Metrics: top1 (expect_must[0] ranked first), top3 recall (expect_must in top
+# 3), prerequisite completion, wrong-product-line rate (expect_never hits), and
+# signal accuracy (does the router know when it does not know).
+
+version: 1
+
+# Thresholds are set just under the current measured scores, so a regression
+# fails CI while a newly added case that exposes a real gap does not
+# immediately break the build for everyone.
+#
+# Honest caveat: these cases were written alongside the router by the same
+# author, so 100% here measures internal consistency, not generalisation. The
+# number becomes meaningful only as cases arrive from real gap events and real
+# oncall tickets written by people who did not build the ranker.
+thresholds:
+  top1: 0.85
+  top3_recall: 0.95
+  prereq: 1.0
+  wrong_line: 0.05
+  signal: 1.0
+
+cases:
+  # ------------------------------------------------------------ performance
+  - id: c01
+    goal: "Starter 集群 P99 从 20ms 涨到 300ms，昨天下午开始变慢，没有做过变更"
+    product_line: starter
+    intent: diagnose
+    expect_must: [diagnosis/tidb-perf-diagnosis]
+    expect_any: [diagnosis/tikv-fast-tune, diagnosis/tikv-performance]
+    expect_never: [diagnosis/ru-limit-inspection, diagnosis/tidbcloud-dedicated-daily-inspection]
+    expect_prereq: [platform/o11y-auth, platform/o11y-metrics-api, platform/tidbcloud-serverless-pool-routing]
+
+  - id: c02
+    goal: "Dedicated 集群查询慢，怀疑是 TiKV 侧的瓶颈，想按决策树一层层排查"
+    product_line: dedicated
+    intent: diagnose
+    expect_must: [diagnosis/tikv-fast-tune]
+    expect_prereq: [platform/clinic-api]
+
+  - id: c03
+    goal: "TiKV 内存一直涨最后 OOM 了，想看 heap profile 和 coprocessor 积压"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-memory]
+
+  - id: c04
+    goal: "TiDB 到 TiKV 的 gRPC 长尾延迟很高，磁盘 IOPS 也打满了，还有 ServerIsBusy"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-performance]
+    expect_any: [diagnosis/tikv-oncall-handbook]
+
+  - id: c05
+    goal: "RocksDB compaction 压力很大，pending compaction bytes 一直涨，磁盘快满了"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-storage]
+
+  # ------------------------------------------------------- crash / recovery
+  - id: c06
+    goal: "TiKV 节点在反复重启，日志里有 SIGSEGV 和 panic"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-panic]
+    expect_any: [diagnosis/tikv-oncall-handbook]
+
+  - id: c07
+    goal: "一个 region 大多数副本都丢了，需要做 unsafe recovery，还有一堆 orphan peer"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-recovery]
+
+  - id: c08
+    goal: "region split 之后 add learner 卡住了，snapshot 一直 apply 不完"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-raftstore]
+
+  - id: c09
+    goal: "缩容 TiKV 的时候 store 一直下不掉，数据迁移特别慢，operator 也不怎么生成"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-scale]
+
+  - id: c10
+    goal: "status port 连不上，抓 pprof 的时候卡死了，还有 fd 泄漏"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-status-server]
+
+  # -------------------------------------------------------------------- PD
+  - id: c11
+    goal: "PD 的 placement rule 被重置了，location label 的隔离也不生效"
+    intent: diagnose
+    expect_must: [diagnosis/pd-placement-rules]
+    expect_any: [diagnosis/pd-oncall-handbook]
+
+  - id: c12
+    goal: "balance-region 一直在刷，patrol region 有漂移，热点也散不开"
+    intent: diagnose
+    expect_must: [diagnosis/pd-scheduling]
+
+  - id: c13
+    goal: "资源组一直被 RU 限流，Time_queued_by_rc 很长，token bucket 好像有问题"
+    intent: diagnose
+    expect_must: [diagnosis/pd-resource-control]
+
+  - id: c14
+    goal: "ETCD 容量要满了，PD leader 的 CPU 也在飙，Dashboard 打不开"
+    intent: diagnose
+    expect_must: [diagnosis/pd-operations]
+
+  - id: c15
+    goal: "stale read 读到了旧数据，怀疑是 async commit 或者悲观锁的正确性问题"
+    intent: diagnose
+    expect_must: [diagnosis/transaction-oncall-handbook]
+
+  # ------------------------------------------------------------------ CDC
+  - id: c16
+    goal: "changefeed 同步延迟越来越大，想先做一次 TiCDC 健康检查"
+    product_line: dedicated
+    intent: inspect
+    expect_must: [diagnosis/ticdc-health-inspection]
+    expect_prereq: [platform/clinic-api]
+
+  - id: c17
+    goal: "要把一个 changefeed 暂停掉，再改它的 sink_uri 然后恢复"
+    product_line: dedicated
+    intent: operate
+    expect_must: [ops/manage-ticdc-changefeeds]
+    expect_prereq: [platform/devops-api]
+
+  - id: c18
+    goal: "CDC 把 TiKV 打 panic 了，还出现了 PD endpoint 复用的问题"
+    intent: diagnose
+    expect_must: [diagnosis/tikv-cdc]
+
+  # ------------------------------------------------- inspection / reporting
+  - id: c19
+    goal: "给 Starter 共享池做一次 TiKV 日常巡检，出一份英文报告"
+    product_line: starter
+    intent: inspect
+    expect_must: [diagnosis/tidbcloud-serverless-daily-inspection]
+    expect_never: [diagnosis/tidbcloud-dedicated-daily-inspection]
+    expect_prereq: [platform/tidbcloud-serverless-pool-routing]
+
+  - id: c20
+    goal: "给 Dedicated 集群做每日巡检，按日期归档成一份日报"
+    product_line: dedicated
+    intent: inspect
+    expect_must: [diagnosis/tidbcloud-dedicated-daily-inspection]
+    expect_never: [diagnosis/tidbcloud-serverless-daily-inspection]
+
+  - id: c21
+    goal: "TiFlash 查询很慢，想做一次健康体检看看 MPP 和 IO 有没有瓶颈"
+    intent: inspect
+    expect_must: [health_check/tiflash-health-inspection]
+    expect_prereq: [platform/clinic-api]
+
+  - id: c22
+    goal: "评估一下 HPA 自动扩缩容做得好不好，生成一个打分的 dashboard"
+    intent: inspect
+    expect_must: [diagnosis/autoscaler-dashboard]
+
+  - id: c23
+    goal: "检查 dedicated-classic-v1 上资源组的 RU limit 用得怎么样，有没有长期超限"
+    product_line: dedicated
+    intent: inspect
+    expect_must: [diagnosis/ru-limit-inspection]
+
+  # ---------------------------------------------------- platform / metadata
+  - id: c24
+    goal: "我要拿这个集群最近一小时的 Prometheus 指标做个对比"
+    product_line: dedicated
+    intent: query
+    expect_any: [platform/o11y-metrics-api, platform/clinic-api, platform/o11y-data]
+
+  - id: c25
+    goal: "把这个集群的慢查询导出来，建一条常驻的监控导出管道"
+    product_line: dedicated
+    intent: manage
+    expect_must: [platform/o11y-data-export]
+    expect_prereq: [platform/o11y-auth]
+
+  - id: c26
+    goal: "查一下 alertstore 里这个集群还有哪些没有 ack 的告警"
+    intent: query
+    expect_must: [platform/alertstore-api]
+
+  - id: c27
+    goal: "把这个 support ticket 升级成 TCOC，顺便关联一下相关 issue"
+    intent: manage
+    expect_must: [platform/jira-api]
+    expect_any: [utilities/oncall-toolkit]
+
+  - id: c28
+    goal: "现在谁在值班？把下周的排班和 handover 也一起看一下"
+    intent: query
+    expect_must: [utilities/oncall-api]
+
+  - id: c29
+    goal: "Dedicated 集群一直卡在 Creating，VPC peering 和 PrivateLink 的 CR 状态想查一下"
+    product_line: dedicated
+    intent: diagnose
+    expect_must: [diagnosis/dedicated-cloud-diag]
+
+  - id: c30
+    goal: "解析一下 us-west-2-f01 这个共享池对应的 vendor region 和 control_plane_info"
+    product_line: starter
+    intent: query
+    expect_must: [platform/tidbcloud-serverless-pool-routing]
+
+  # ----------------------------------------------------------- ops / others
+  - id: c31
+    goal: "在一台干净的远程机器上用 tar.gz 部署一套单机 TiDBX，带 MinIO"
+    product_line: self-hosted
+    intent: deploy
+    expect_must: [ops/deploy-tidbx]
+
+  - id: c32
+    goal: "统计一下 TiDB X 的集群增长趋势，按天看新增和累计"
+    product_line: starter
+    intent: report
+    expect_must: [growth/analyzing-tidb-x-growth]
+
+  - id: c33
+    goal: "列一下阿里云国际站这个 region 的 ECS，看看哪些机器 CPU 一直很闲，能省点钱"
+    intent: report
+    expect_must: [finops/alicloud-ecs-cpu-inventory]
+
+  - id: c34
+    goal: "在本地起个 playground，用 dbgen 造点有倾斜的数据然后 IMPORT INTO 验证一下"
+    product_line: self-hosted
+    intent: operate
+    expect_must: [utilities/dbgen-playground-import]
+
+  - id: c35
+    goal: "看看 TCOC 上最近的 Incident 工单里有哪些其实不是真实故障，是配额或者账单问题"
+    intent: report
+    expect_must: [daily_work/tcoc-incident-review]
+    expect_prereq: [platform/jira-api]
+
+  # ---------------------------------------- knowing when it does not know
+  # These carry no expect_must on purpose. A router that always produces a
+  # confident top-3 is not a router, it is a random skill generator with good
+  # manners. The failure mode being tested is dressing up adjacent skills as an
+  # answer, which is exactly what happens when nobody measures it.
+
+  - id: c36
+    goal: "帮我订下周去北京的机票"
+    expect_signal: none
+
+  - id: c37
+    goal: "评估把 TiDB 换成 PostgreSQL 的迁移成本和改造工作量"
+    expect_signal: weak
+
+  - id: c38
+    goal: "给这套集群出一份 SOC2 合规审计报告"
+    expect_signal: weak
+
+  - id: c39
+    goal: "帮我给这个 Java 微服务写一套单元测试"
+    expect_signal: none
+
+  # ------------------------------------------------------- near-miss pairs
+  # Each pair shares most of its vocabulary and differs only by intent or by
+  # product line. These are where a keyword ranker quietly goes wrong.
+
+  - id: c40
+    goal: "Starter 集群最近一小时的 TiKV CPU 指标拉出来看看"
+    product_line: starter
+    intent: query
+    expect_must: [platform/o11y-metrics-api]
+    expect_prereq: [platform/o11y-auth, platform/tidbcloud-serverless-pool-routing]
+    # Measured signal here is 'weak': the router ranks this correctly on one
+    # concept of overlap (指标), because o11y-metrics-api's text says
+    # metrics/prometheus, not tikv/cpu. Correct answer, thin keyword overlap -
+    # which is exactly why signal is not asserted on positive cases.
+
+  - id: c41
+    goal: "列一下这个集群上现在有哪些 changefeed，先不动它们"
+    product_line: dedicated
+    intent: query
+    expect_must: [ops/manage-ticdc-changefeeds]
+    expect_prereq: [platform/devops-api]
+
+  - id: c42
+    goal: "TiKV 一直 OOM"
+    expect_must: [diagnosis/tikv-memory]
+
+  - id: c43
+    goal: "把这个集群的备份恢复到一个新集群里去"
+    product_line: dedicated
+    intent: manage
+    expect_must: [platform/tidbcloud-cli]
+    # Measured signal is 'none': "备份恢复到新集群" carries almost no English,
+    # and the ranking is carried by the intent prior rather than keywords. Right
+    # answer, no keyword evidence - a standing argument for vector retrieval.

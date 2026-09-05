@@ -1,0 +1,20 @@
+---
+description: Rebuild and inspect the nutshell-skills capability catalog
+argument-hint: "[rebuild|digest|stats|<search term>]"
+---
+
+Argument: $ARGUMENTS
+
+- empty or `rebuild` — run `node "${CLAUDE_PLUGIN_ROOT}/scripts/build-catalog.mjs"`
+  and report the source commit, skill count, overlay coverage, and any problems.
+- `digest` — run `node "${CLAUDE_PLUGIN_ROOT}/scripts/retrieve.mjs" --digest`
+  and show the capability digest.
+- `stats` — read `catalog/catalog.json` and summarise counts by category, by
+  effect, and the context-cost totals.
+- anything else — treat it as a goal and run
+  `node "${CLAUDE_PLUGIN_ROOT}/scripts/retrieve.mjs" --goal "<it>" --top 10`,
+  showing the shortlist without planning or executing.
+
+Report problems verbatim. An orphaned overlay id or an unparseable frontmatter
+block means the config layer has drifted from upstream and needs a fix, not a
+workaround.

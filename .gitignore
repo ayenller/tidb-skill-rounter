@@ -1,0 +1,4 @@
+.cache/
+.tidb-aio/
+node_modules/
+.DS_Store
