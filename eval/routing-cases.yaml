@@ -20,12 +20,15 @@
 #   expect_signal strong | weak | none - how much of what the operator said
 #                 actually overlapped the top candidate.
 #
-#                 Asserted ONLY on negative cases, where the point is that the
-#                 router can say it does not know. It is deliberately NOT
-#                 asserted on positive cases: signal measures keyword overlap,
-#                 not correctness, and short Chinese goals routinely route
-#                 correctly on one concept of overlap or none at all (see c40,
-#                 c43). Gating execution on signal alone would be wrong.
+#                 Asserted almost exclusively on negative cases, where the
+#                 point is that the router can say it does not know. It is
+#                 deliberately NOT asserted on positive cases as a correctness
+#                 check: signal measures keyword overlap, not correctness, and
+#                 short Chinese goals routinely route correctly on one concept
+#                 of overlap or none at all (see c40, c43). Gating execution on
+#                 signal alone would be wrong. The one exception is a case built
+#                 to pin a specific signal-computation bug rather than to check
+#                 general correctness (see c45).
 #
 # Metrics: top1 (expect_must[0] ranked first), top3 recall (expect_must in top
 # 3), prerequisite completion, wrong-product-line rate (expect_never hits), and
@@ -317,3 +320,24 @@ cases:
     # Measured signal is 'none': "备份恢复到新集群" carries almost no English,
     # and the ranking is carried by the intent prior rather than keywords. Right
     # answer, no keyword evidence - a standing argument for vector retrieval.
+
+  # ------------------------------------------------- tenant/org are one thing
+  # In TiDB Cloud "tenant" and "org"/"org_id" name the same identifier -
+  # different upstream skills inherited whichever word their underlying API
+  # generation used (Ops Portal and growth reporting say "tenant", Clinic's own
+  # parameter is "org_id"). Without folding them to one token, a query written
+  # with "org" cannot find a skill whose text only says "tenant" - platform/
+  # devops-api used to be completely absent from c44's shortlist.
+  - id: c44
+    goal: "Which clusters and changefeeds belong to this org? Any recent releases?"
+    intent: query
+    expect_any: [platform/devops-api, ops/manage-ticdc-changefeeds]
+
+  - id: c45
+    goal: "帮我查一下这个 org 下面都有哪些集群，最近有没有做过发布"
+    intent: query
+    expect_must: [platform/devops-api]
+    # Also pins the signal fix alongside the synonym fold: this case's top1 has
+    # two real concepts behind it (tenant, 发布/release), so it must never read
+    # 'none' just because the overall candidate pool needed fallback padding.
+    expect_signal: strong

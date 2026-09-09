@@ -100,7 +100,7 @@ Harness 的核心命题是 **Agent = Model + Harness**：模型提供智能，Ha
 objective:     "Starter 集群从昨天 14:00 起 P99 从 20ms 涨到 300ms"   # 必填
 deliverable:   conclusion | report | action | script                  # 默认 conclusion
 product_line:  dedicated | starter | essential | premium | byoc | self-hosted | unknown
-target:        { org_id?, cluster_id?, pool?, tenant?, jira?, changefeed? }
+target:        { org_id?, cluster_id?, pool?, jira?, changefeed? }   # org_id 就是 tenant id——TiDB Cloud 里两个词指同一个标识符，不建两个槽位
 time_window:   { from, to }                                           # 诊断类必填
 evidence:      ["Grafana 上 TiKV gRPC duration 同步上涨", "无变更"]     # 用户的已知条件
 access:        [clinic_api_key?, github_pat?, ticloud_login?, ssh?, chrome_session?]

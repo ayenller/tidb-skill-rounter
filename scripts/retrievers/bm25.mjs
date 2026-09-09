@@ -11,19 +11,34 @@
 // same two exports. Nothing else in the plugin changes.
 
 export const id = 'bm25';
-export const describes = 'BM25-ish keyword scoring over name/subject/summary/description, with a bilingual lexicon and a zero-hit recall fallback';
+export const describes = 'BM25-ish keyword scoring over name/subject/summary/description, with a bilingual lexicon, TiDB-domain synonym folding, and a zero-hit recall fallback';
 
 const FIELD_WEIGHTS = { name: 3, subject: 3, summary: 2, description: 1, category: 1 };
 const STOP = new Set(('a an and are as at be by for from has how in is it its of on or that the to use used '
   + 'when with this these those you your we our i my via into over under between them they there here what '
   + 'which who why skill skills tidb cloud cluster').split(' '));
 
+// Domain synonyms: same-language equivalences specific to TiDB Cloud, as
+// opposed to config/lexicon.yaml's Chinese-to-English translation. In TiDB
+// Cloud a tenant IS an org - Ops Portal and growth reporting say "tenant",
+// Clinic's own API parameter is "org_id" - and upstream skill text uses
+// whichever word its author's API generation happened to use. Folding both to
+// one canonical token means a query written with either word matches skill
+// text written with either word. Kept deliberately narrow: this is a named
+// fact about the domain, not a general synonym engine.
+const SYNONYMS = {
+  org: 'tenant', orgs: 'tenant', org_id: 'tenant', orgid: 'tenant',
+  organization: 'tenant', organizations: 'tenant', organisation: 'tenant', organisations: 'tenant',
+  tenant_id: 'tenant', tenantid: 'tenant',
+};
+
 function words(s) {
   return String(s || '')
     .toLowerCase()
     .split(/[^a-z0-9_+-]+/)
     .map((w) => w.replace(/^-+|-+$/g, ''))
-    .filter((w) => w.length > 1 && !STOP.has(w));
+    .filter((w) => w.length > 1 && !STOP.has(w))
+    .map((w) => SYNONYMS[w] || w);
 }
 
 // Chinese goals against English skill text: expand through the lexicon before
@@ -204,7 +219,19 @@ export function retrieve(frame, { catalog, lexicon }) {
   // must not claim a match when only one concept, or none, actually matched.
   const top1 = top[0];
   const top1Concepts = top1 ? [...new Set(top1.matched.map((t) => concepts.get(t) || t))] : [];
-  const signal = fallback ? 'none' : top1Concepts.length <= 1 ? 'weak' : 'strong';
+  // Bug fixed here: this used to read `fallback ? 'none' : ...`, conflating two
+  // different questions. `fallback` means "fewer than 3 skills scored above
+  // zero, so the shortlist was padded with intent/entry-prior picks" - a
+  // statement about the POOL's breadth. `signal` is about whether TOP1
+  // specifically has real evidence. A query that genuinely and correctly
+  // matches only one or two skills triggers the pool-padding fallback while
+  // top1 still has solid matches behind it - e.g. "which clusters and
+  // changefeeds belong to this org" correctly hits platform/devops-api on the
+  // tenant/org synonym, but only two other skills score above zero at all, so
+  // fallback fires and used to stamp this as signal:'none' - actively telling
+  // the router to distrust a good match. top1.matched is computed before
+  // fallback padding runs either way, so it is always the honest source.
+  const signal = top1Concepts.length === 0 ? 'none' : top1Concepts.length === 1 ? 'weak' : 'strong';
   const margin = top.length > 1 && top[0].score > 0
     ? Number(((top[0].score - top[1].score) / top[0].score).toFixed(2))
     : null;

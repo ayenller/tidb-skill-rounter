@@ -45,6 +45,10 @@ terms:
   集群: cluster
   节点: node store instance
   实例: instance node
+  # org and tenant are the same identifier in TiDB Cloud, so both Chinese words
+  # expand to both English words here - and scripts/retrievers/bm25.mjs folds
+  # "org"/"organization"/"tenant" to one canonical token regardless of which
+  # language or which English word the query used. See CONTRACT.md obligation 7.
   租户: tenant org
   组织: org tenant
   资源组: resource-group ru quota

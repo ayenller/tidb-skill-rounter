@@ -42,7 +42,7 @@ Keep `$SID` for the rest of the session. Every later step appends to it.
 |---|---|---|
 | `objective` | always | the query itself |
 | `product_line` | any cluster-scoped task | Starter/Essential route through serverless pool routing + O11Y; Dedicated/Premium/BYOC route through Clinic; self-hosted routes through TiUP/Grafana skills |
-| `target` | any cluster-scoped task | cluster_id / org_id / pool / tenant / Jira key / changefeed name |
+| `target` | any cluster-scoped task | cluster_id / org_id (**== tenant id** — TiDB Cloud uses "org" and "tenant" for the same identifier; never ask for both) / pool / Jira key / changefeed name |
 | `time_window` | diagnose, inspect | every metrics skill needs it |
 | `evidence` | diagnose | the user's known conditions are the strongest retrieval signal |
 | `constraints.read_only` | always | defaults to **true**; flipping it changes which steps survive the gate |
@@ -59,6 +59,9 @@ Rules:
   product line; if Dedicated, swap s3 for `platform/clinic-api`."
 - Do not ask anything you can derive. A serverless cluster id prefix, an Ops
   Portal URL, or a Jira key already answers a slot.
+- `org_id` and `tenant` are one identifier, not two. If the user gives you
+  either word, fill `target` and move on — do not ask a follow-up to
+  disambiguate which one they mean.
 
 Log the round:
 

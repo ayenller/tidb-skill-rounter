@@ -71,12 +71,27 @@ frame = {
 4. **`signal` is evidence strength, not correctness.** Count distinct concepts
    the operator expressed, not tokens: one word expanding into three synonyms is
    one concept. Overstating this is how a cost-inventory skill becomes a
-   confident answer to a database migration question.
+   confident answer to a database migration question. It must also be computed
+   from the top candidate's own matched evidence, never from a pool-breadth
+   signal like "did I need to pad the shortlist" — a query that genuinely and
+   correctly matches only one or two skills is not the same failure as a query
+   that matches nothing, and conflating them (bm25.mjs did, once) tells the
+   router to distrust a good match.
 5. **Honour the hard filters.** `productLine` scope and `explicit_only` are not
    ranking hints; a skill outside the product line must not appear at all.
 6. **Compute the prerequisite closure** from `requires` and
    `requires_when[productLine]`, topologically ordered, over grounded candidates
    only.
+7. **Fold same-language domain synonyms, not just translations.**
+   `config/lexicon.yaml` handles Chinese-to-English; it does not help a query
+   that says "org" against catalog text that says "tenant" — same language, same
+   meaning, different word, because upstream skills inherited whichever term
+   their underlying API generation used. TiDB Cloud's own domain has at least
+   one of these: **org and tenant are the same identifier.** A keyword retriever
+   should canonicalize known domain synonyms before scoring (see `SYNONYMS` in
+   `bm25.mjs`); an embedding retriever gets this closer to free but should still
+   be checked against it — embeddings are not guaranteed to place a product's
+   internal jargon pair as close as a human reading both API docs would.
 
 ## Verifying a new retriever
 
