@@ -1,0 +1,14 @@
+{
+  "name": "tidb-all-in-one",
+  "owner": { "name": "TiDB All-in-One" },
+  "metadata": {
+    "description": "Goal-driven router over tidbcloud/nutshell-skills. Local single-plugin marketplace for development installs."
+  },
+  "plugins": [
+    {
+      "name": "tidb-all-in-one",
+      "source": "./",
+      "description": "State a TiDB Cloud goal and known conditions; get a validated plan of which nutshell-skills to invoke, in what order, with prerequisites and safety gates filled in. Adds /tidb, /tidb-plan, /tidb-which, /tidb-resume, /tidb-catalog."
+    }
+  ]
+}
