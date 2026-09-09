@@ -1,4 +1,4 @@
-# TiDB All-in-One
+# TiDB Skill Router
 
 A goal-driven router over [`tidbcloud/nutshell-skills`](https://github.com/tidbcloud/nutshell-skills).
 
@@ -10,9 +10,31 @@ of them in context.
 
 Design rationale and the full architecture: [DESIGN.md](DESIGN.md).
 
+## Prerequisite: access to `tidbcloud/nutshell-skills`
+
+The 59 skills this router indexes live in a **private** PingCAP repository.
+Cloning it (`make sync`, below) only works if:
+
+1. your GitHub account is a **member of the `tidbcloud` org**, with read access
+   to `tidbcloud/nutshell-skills` — ask whoever administers that org to add you;
+2. locally, `gh auth status` shows you logged in as that account (this repo's
+   `scripts/sync-source.sh` clones via `gh repo clone`, falling back to
+   `git@github.com:tidbcloud/nutshell-skills.git` over SSH if `gh` is absent).
+
+Without both, `make sync` / `make smoke` / `/tidb` fail at the same first step:
+resolving the skill source. There is nothing this repo can do about that on its
+own — see [`config/settings.json`](config/settings.json) and
+[`scripts/lib/paths.mjs`](scripts/lib/paths.mjs) if you'd rather point at a
+checkout someone else already made (a shared drive, an internal mirror), via
+`NUTSHELL_SKILLS_PATH` or `nutshellPath`.
+
+The daily CI job ([`.github/workflows/catalog-drift.yml`](.github/workflows/catalog-drift.yml))
+needs the same access from the *runner's* side: a `NUTSHELL_SKILLS_TOKEN`
+repository secret holding a PAT with read access to `tidbcloud/nutshell-skills`.
+
 ## Why
 
-Installing all 59 skills costs roughly **199k tokens** of `SKILL.md` (553k with
+Installing all 59 skills costs roughly **199k tokens** of `SKILL.md` (555k with
 their bundled `references/` and `knowledge/`), and still leaves you guessing
 whether a TiKV latency problem belongs to `tikv-fast-tune` or `tikv-performance`
 — or that `o11y-metrics-api` is useless until you have run `o11y-auth` first.
@@ -23,14 +45,14 @@ once the plan selects it.
 ## Install
 
 ```bash
-git clone <this repo> TiDB-All-in-One && cd TiDB-All-in-One
-make sync      # clone tidbcloud/nutshell-skills into .cache/
+git clone https://github.com/ayenller/tidb-skill-rounter.git && cd tidb-skill-rounter
+make sync      # clone tidbcloud/nutshell-skills into .cache/ - see the prerequisite above
 make catalog   # generate catalog/catalog.json + catalog/digest.md
-make smoke     # M0 acceptance
+make smoke     # acceptance: catalog + routing + plan verification + trajectory + eval
 ```
 
-Then add the directory as a Claude Code plugin. Point it at an existing
-checkout instead of `.cache/` with either:
+Already have a `nutshell-skills` checkout elsewhere (a shared drive, another
+clone)? Point at it instead of letting `make sync` make its own, with either:
 
 ```bash
 export NUTSHELL_SKILLS_PATH=~/lc/nutshell-skills
@@ -38,6 +60,29 @@ export NUTSHELL_SKILLS_PATH=~/lc/nutshell-skills
 
 or `nutshellPath` in `config/settings.json`. The resolver also recovers the
 checkout by following a live symlink under `~/.claude/skills/`.
+
+Then register it as a Claude Code plugin — there is no published marketplace
+yet, so this repo doubles as its own single-plugin local marketplace
+(`.claude-plugin/marketplace.json`):
+
+```bash
+claude plugin marketplace add /path/to/tidb-skill-rounter
+claude plugin install tidb-all-in-one@tidb-all-in-one -y
+```
+
+Start a **new** Claude Code session afterwards — the command list loads at
+session start, so `/tidb` will not appear in a session that was already
+running when you installed. `claude plugin install` copies the repo into
+`~/.claude/plugins/cache/`; it is a snapshot, not a live link, and
+`claude plugin update` only re-copies when `.claude-plugin/plugin.json`'s
+`version` field changes. While iterating locally, the reliable way to pick up
+an edit is:
+
+```bash
+claude plugin uninstall tidb-all-in-one && claude plugin install tidb-all-in-one@tidb-all-in-one -y
+```
+
+(then start a new session again).
 
 ## Use
 
@@ -124,8 +169,8 @@ with its token cost and the reason it was loaded, and each completed step.
 
 ```bash
 make sessions
-node scripts/trajectory.mjs resume s_20260905_0933_85f0
-node scripts/trajectory.mjs fork   s_20260905_0933_85f0 --at s4   # try a second hypothesis
+node scripts/trajectory.mjs resume s_20260905_150414_bb70
+node scripts/trajectory.mjs fork   s_20260905_150414_bb70 --at s4   # try a second hypothesis
 ```
 
 ## Is the routing any good?
@@ -144,11 +189,12 @@ must contain:
 | prerequisites inserted | 100% | 100% |
 | wrong product line | 0% | <= 5% |
 | knows when it does not know | 100% | 100% |
-| coarse-filter fallback | 11.6% | — |
+| coarse-filter fallback | 13.3% | — |
 
-43 cases: 35 real goals, 4 near-miss pairs that differ only by intent or product
-line, and 4 that **no skill covers** — because a router that always produces a
-confident top 3 is a random skill generator with good manners.
+45 cases: 35 real goals, 4 near-miss pairs that differ only by intent or product
+line, 4 that **no skill covers**, and 2 that pin a specific tenant/org synonym
+regression (below) — because a router that always produces a confident top 3 is
+a random skill generator with good manners.
 
 **Read that honestly**: the cases and the ranker were written by the same author,
 so 100% measures internal consistency, not generalisation. The score becomes
@@ -166,7 +212,15 @@ found a defect in the router rather than in the cases:
 - adding near-miss pairs: `manage-ticdc-changefeeds` was missing the `query`
   intent that its own upstream description documents, and the lexicon mapped
   恢复 to both `restore` and `recovery`, pulling backup/restore goals toward the
-  TiKV unsafe-recovery handbook.
+  TiKV unsafe-recovery handbook;
+- adding a tenant/org case: "which clusters belong to this **org**" could not
+  find `platform/devops-api` at all — its catalog text only ever says
+  "tenant", and TiDB Cloud treats the two words as one identifier. Fixing that
+  exposed a second bug in the same code path: `signal` was computed as
+  `fallback ? 'none' : ...`, conflating "the shortlist needed padding because
+  fewer than 3 skills scored above zero" with "the top candidate has no real
+  evidence" — a query that correctly matches only one or two skills was getting
+  told it matched nothing.
 
 One thing the eval also settled: `signal` measures keyword overlap, **not**
 correctness. Short Chinese goals route correctly on one concept of overlap or
@@ -202,7 +256,7 @@ them is a lexicon edit:
    gap in the overlay. This is the common one: "TiKV CPU 指标" scored weak
    against `o11y-metrics-api` because its text says *metrics/prometheus/promql*
    and never names a component. Adding the components it serves took that case
-   from weak to strong with zero regressions across 43 eval cases;
+   from weak to strong with zero regressions across the eval suite;
 3. a phrase no skill covers → leave it. Scoring zero is the router correctly
    reporting it does not know.
 
@@ -219,8 +273,9 @@ routing eval, and a daily CI job that rebuilds the catalog against upstream HEAD
 and opens a drift PR.
 
 Also implemented: the retriever seam (proved behaviour-preserving — extracting
-BM25 into `scripts/retrievers/bm25.mjs` changed no ranking in any of the 43
-cases), the lexicon audit, and the OpenCode/Codex adapters.
+BM25 into `scripts/retrievers/bm25.mjs` changed no ranking across the eval
+suite), the lexicon audit, TiDB-domain synonym folding (`org`/`tenant` are one
+identifier — see `SYNONYMS` in `bm25.mjs`), and the OpenCode/Codex adapters.
 
 Not done: a semantic retriever. It is the only real answer to a goal like
 "把备份恢复到新集群", which routes correctly today on the intent prior with **no**
