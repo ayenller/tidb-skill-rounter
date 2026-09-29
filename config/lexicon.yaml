@@ -61,6 +61,13 @@ terms:
   数据恢复: recovery restore
   故障恢复: recovery unsafe-recovery
   监控: metrics monitoring prometheus grafana
+  # Compound terms, not the bare "操作" - that alone is too generic (it shows up
+  # in unrelated goals like "手动操作") and would fire everywhere.
+  操作记录: activity events audit-trail
+  操作行为: activity events audit-trail
+  操作日志: activity events audit-trail
+  审计日志: audit-trail activity
+  活动记录: activity events
   指标: metrics prometheus promql
   日志: logs loki log
   告警: alert alerting alertstore

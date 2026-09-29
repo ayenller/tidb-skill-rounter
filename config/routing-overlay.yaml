@@ -46,7 +46,12 @@ skills:
   platform/clinic-api:
     intent: [query]
     scope: [dedicated, byoc, starter, essential, premium]
-    subject: [metadata, metrics, logs, slow-query, top-sql, topology, component, profiling]
+    # "activity, events, audit-trail" found via a real query ("监控某个 org 的
+    # 操作行为") that ranked this skill #7 instead of #1: its activity-hub
+    # sub-skill (GET .../orgs/{orgID}/clusters/{clusterID}/activities) is the
+    # actual org-level operation-log endpoint, but the top-level description
+    # never says "activity" - classic subject gap, see scripts/lexicon-audit.mjs.
+    subject: [metadata, metrics, logs, slow-query, top-sql, topology, component, profiling, activity, events, audit-trail, lifecycle-events]
     inputs: [org_id, cluster_id]
     effect: read-only
     entry: true

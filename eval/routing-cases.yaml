@@ -341,3 +341,20 @@ cases:
     # two real concepts behind it (tenant, 发布/release), so it must never read
     # 'none' just because the overall candidate pool needed fallback padding.
     expect_signal: strong
+
+  # ------------------------------------------------------ org activity/audit
+  # platform/clinic-api's activity-hub sub-skill (GET .../orgs/{orgID}/
+  # clusters/{clusterID}/activities) is the actual org-level operation-log
+  # endpoint - lifecycle events for create/scale/maintenance/config-change/
+  # GitOps. It used to rank #7 behind devops-api (PingCAP's own release
+  # tooling, a false lead on "tenant"/"change") because the top-level
+  # description never says "activity" and 监控/操作/行为 had no lexicon entry.
+  - id: c46
+    goal: "怎么监控某个 org 的操作行为，比如集群创建、扩缩容、配置变更这些操作记录"
+    intent: query
+    expect_must: [platform/clinic-api]
+
+  - id: c47
+    goal: "How do I audit an org's activity - cluster creation, scaling, config changes?"
+    intent: query
+    expect_must: [platform/clinic-api]

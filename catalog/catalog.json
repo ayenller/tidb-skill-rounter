@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-09-05T09:06:59.830Z",
+  "generated_at": "2026-09-29T02:08:10.753Z",
   "source": {
     "repo": "tidbcloud/nutshell-skills",
     "commit": "dddd54f",
@@ -1534,7 +1534,11 @@
         "top-sql",
         "topology",
         "component",
-        "profiling"
+        "profiling",
+        "activity",
+        "events",
+        "audit-trail",
+        "lifecycle-events"
       ],
       "requires": [],
       "requires_when": {},
